@@ -113,7 +113,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.26, y: -3.36, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6944113029707486644}
@@ -137,8 +137,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 5
-  m_jumpForce: 4.5
-  m_rollForce: 6
+  m_jumpForce: 5.5
+  m_rollForce: 7
   m_noBlood: 0
   m_slideDust: {fileID: 1038168246061390451, guid: 8b8c8cc6774fb074cb9139cc631b108e, type: 3}
   attackPoint: {fileID: 2502575877423326194}
@@ -155,6 +155,9 @@ MonoBehaviour:
   rollIFrames: 0.3
   rollCooldown: 0.8
   parryWindow: 0.25
+  wallJumpForceX: 5
+  wallJumpForceY: 6.5
+  wallJumpInputFreeze: 0.2
   isStunned: 0
 --- !u!95 &6981859684473223624
 Animator:
@@ -220,7 +223,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 56724757
-  m_SortingLayer: 1
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: ae297123f091bbf4e8f1835eb98fb293, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
