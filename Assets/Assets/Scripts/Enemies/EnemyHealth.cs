@@ -58,6 +58,7 @@ public class EnemyHealth : MonoBehaviour
             fungusAI.InterruptCombo();
             // Se il fungo si è appena arrabbiato o lo era già, diciamo a questo script di ignorare lo stordimento
             if (fungusAI.hasSuperArmor) ignoreStun = true;
+            fungusAI.PlayFlashEffect();
         }
         // ----------------------------------------
 
