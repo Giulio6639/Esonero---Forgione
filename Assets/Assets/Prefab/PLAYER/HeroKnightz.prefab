@@ -149,7 +149,7 @@ MonoBehaviour:
   attackDamage: 30
   comboExtraDamage: 20
   missCooldown: 0.6
-  attackActiveDuration: 0.15
+  attackActiveDuration: 0.1
   playerLayerName: Player
   enemyLayerName: Enemy
   rollIFrames: 0.3

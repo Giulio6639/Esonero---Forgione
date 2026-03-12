@@ -2,18 +2,32 @@ using UnityEngine;
 
 public class EnemyAnimEvents : MonoBehaviour
 {
-    private SkeletonAI ai;
+    private SkeletonAI skeletonAI;
+    private GoblinAI goblinAI;
+    private FungusAI fungusAI; // Aggiunto il Fungo
 
     void Start()
     {
-        // Trova in automatico lo script sul genitore
-        ai = GetComponentInParent<SkeletonAI>();
+        // Cerca lo script nel genitore, chiunque esso sia!
+        skeletonAI = GetComponentInParent<SkeletonAI>();
+        goblinAI = GetComponentInParent<GoblinAI>();
+        fungusAI = GetComponentInParent<FungusAI>();
     }
 
-    // Questa funzione verrà chiamata dall'animazione
+    // Questa funzione verrà chiamata dall'animazione di QUALSIASI nemico
     public void Hit()
     {
-        if (ai != null)
-            ai.TriggerAttackHit();
+        if (skeletonAI != null)
+        {
+            skeletonAI.TriggerAttackHit();
+        }
+        else if (goblinAI != null)
+        {
+            goblinAI.TriggerAttackHit();
+        }
+        else if (fungusAI != null)
+        {
+            fungusAI.TriggerAttackHit();
+        }
     }
 }

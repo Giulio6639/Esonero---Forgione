@@ -4,7 +4,7 @@ using UnityEngine;
 public class EnemyHealth : MonoBehaviour
 {
     [Header("Impostazioni Salute")]
-    public int maxHealth = 60;
+    public int maxHealth = 60; // RICORDA: nell'Inspector per il fungo, alza questo valore a 150 o 200!
     public int currentHealth;
 
     [Header("Danno da Contatto")]
@@ -16,10 +16,9 @@ public class EnemyHealth : MonoBehaviour
     public float knockbackForceY = 2f;
     public float knockbackDuration = 0.2f;
 
-    // --- NUOVE VARIABILI PER LA MORTE ---
     [Header("Morte e Particelle")]
-    public float disappearDelay = 2.5f;   // Quanti secondi il cadavere rimane a terra
-    public GameObject deathParticles;     // Il prefabbricato delle particelle (es. fumo o sangue)
+    public float disappearDelay = 2.5f;
+    public GameObject deathParticles;
 
     [Header("Riferimenti")]
     public Behaviour aiScript;
@@ -50,12 +49,35 @@ public class EnemyHealth : MonoBehaviour
 
         currentHealth -= damageAmount;
 
+        // --- CONTROLLO SUPER ARMOR DEL FUNGO ---
+        bool ignoreStun = false;
+        FungusAI fungusAI = GetComponent<FungusAI>();
+        if (fungusAI != null)
+        {
+            // Passa il danno all'IA per contare i colpi
+            fungusAI.InterruptCombo();
+            // Se il fungo si è appena arrabbiato o lo era già, diciamo a questo script di ignorare lo stordimento
+            if (fungusAI.hasSuperArmor) ignoreStun = true;
+        }
+        // ----------------------------------------
+
+        GoblinAI goblinAI = GetComponent<GoblinAI>();
+        if (goblinAI != null) goblinAI.InterruptCombo();
+
+
         if (currentHealth <= 0)
         {
             Die();
         }
         else
         {
+            // Se ha la Super Armor, salta il knockback e l'animazione!
+            if (ignoreStun)
+            {
+                // Il nemico prende danno, ma non si ferma!
+                return;
+            }
+
             animator.SetTrigger("Hurt");
             StartCoroutine(HitReaction(attacker, applyKnockback));
         }
@@ -63,7 +85,8 @@ public class EnemyHealth : MonoBehaviour
 
     private IEnumerator HitReaction(Transform attacker, bool applyKnockback)
     {
-        if (aiScript != null) aiScript.enabled = false;
+        // Disabilita lo script AI per lo stordimento (se non è un nemico che si gestisce da solo)
+        if (aiScript != null && GetComponent<GoblinAI>() == null && GetComponent<FungusAI>() == null) aiScript.enabled = false;
 
         if (applyKnockback)
         {
@@ -77,7 +100,8 @@ public class EnemyHealth : MonoBehaviour
 
         yield return new WaitForSeconds(knockbackDuration);
 
-        if (currentHealth > 0 && aiScript != null)
+        // Riabilita
+        if (currentHealth > 0 && aiScript != null && GetComponent<GoblinAI>() == null && GetComponent<FungusAI>() == null)
         {
             aiScript.enabled = true;
         }
@@ -85,40 +109,50 @@ public class EnemyHealth : MonoBehaviour
 
     private void Die()
     {
-        animator.SetBool("isDead", true);
+        // 1. Torniamo a usare il Bool!
+        if (animator != null) animator.SetBool("isDead", true);
+
+        // ... resto del codice identico a prima ...
+        GoblinAI goblin = GetComponent<GoblinAI>();
+        if (goblin != null) goblin.enabled = false;
+
+        SkeletonAI skeleton = GetComponent<SkeletonAI>();
+        if (skeleton != null) skeleton.enabled = false;
+
+        FungusAI fungus = GetComponent<FungusAI>();
+        if (fungus != null) fungus.enabled = false;
+
         if (aiScript != null) aiScript.enabled = false;
 
-        // 1. Fermiamo ogni movimento
-        rb.linearVelocity = Vector2.zero;
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+        }
 
-        // 2. Spegniamo la gravità (Kinematic) così non cade
-        rb.bodyType = RigidbodyType2D.Kinematic;
-
-        // 3. Spegniamo il collider così il giocatore ci passa attraverso
-        GetComponent<Collider2D>().enabled = false;
+        Collider2D[] allColliders = GetComponentsInChildren<Collider2D>();
+        foreach (Collider2D col in allColliders)
+        {
+            col.enabled = false;
+        }
 
         StartCoroutine(DisappearRoutine());
     }
 
-    // --- LA COROUTINE CHE GESTISCE LA SPARIZIONE ---
     private IEnumerator DisappearRoutine()
     {
-        // 1. Aspetta che il cadavere stia a terra per il tempo deciso
         yield return new WaitForSeconds(disappearDelay);
 
-        // 2. Se hai assegnato un effetto particellare nell'Inspector, spawnano!
         if (deathParticles != null)
         {
-            // Instanzia le particelle esattamente dove si trova il nemico ora
             Instantiate(deathParticles, transform.position, Quaternion.identity);
         }
 
-        // 3. Elimina definitivamente l'oggetto "Scheletro" dalla memoria del gioco
         Destroy(gameObject);
     }
+
     private void OnDisable()
     {
-        // Uccide all'istante qualsiasi Coroutine (timer) in corso per questo script
         StopAllCoroutines();
     }
 }

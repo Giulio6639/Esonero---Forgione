@@ -1,22 +1,29 @@
 using UnityEngine;
+using System.Collections;
 
-public class SkeletonAI : MonoBehaviour
+public class GoblinAI : MonoBehaviour
 {
     [Header("Movimento")]
     public float walkSpeed = 2f;
-    public float chaseSpeed = 3.5f;
+    public float chaseSpeed = 4.0f;
 
     [Header("Sensori (Distanze)")]
     public float sightRange = 6f;
-    public float attackRange = 1.2f;
+    public float attackRange = 1.5f;
 
-    [Header("Combattimento")]
+    [Header("Combattimento - Statistiche")]
     public Transform attackPoint;
     public float attackHitRadius = 0.5f;
     public LayerMask playerLayer;
-    public int attackDamage = 20;
+    public int attackDamage = 15;
+    public float attackCooldown = 3f;
 
-    public float attackCooldown = 4f;
+    [Header("Combattimento - Tempistiche Combo")]
+    public float attack1Duration = 0.4f;
+    public float hopBackSpeed = 5f;
+    public float hopBackDuration = 0.2f;
+    public float lungeForwardSpeed = 6f;
+    public float lungeDuration = 0.3f;
 
     [Header("Riferimenti")]
     public Transform player;
@@ -25,7 +32,7 @@ public class SkeletonAI : MonoBehaviour
     private Rigidbody2D rb;
     private bool facingRight = true;
 
-    private enum State { Idle, Wander, Chase, Cooldown }
+    private enum State { Idle, Wander, Chase, Attacking, Cooldown }
     private State currentState;
 
     private float stateTimer;
@@ -89,11 +96,8 @@ public class SkeletonAI : MonoBehaviour
                     int lookDir = player.position.x > transform.position.x ? 1 : -1;
                     Flip(lookDir);
 
-                    animator.SetInteger("AttackIndex", 1);
-                    animator.SetTrigger("Attack");
-
-                    stateTimer = attackCooldown;
-                    currentState = State.Cooldown;
+                    currentState = State.Attacking;
+                    StartCoroutine(GoblinComboRoutine(lookDir));
                     break;
                 }
 
@@ -105,6 +109,10 @@ public class SkeletonAI : MonoBehaviour
                 Flip(chaseDir);
                 break;
 
+            case State.Attacking:
+                // La Coroutine comanda qui
+                break;
+
             case State.Cooldown:
                 rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
                 stateTimer -= Time.deltaTime;
@@ -113,19 +121,51 @@ public class SkeletonAI : MonoBehaviour
         }
     }
 
+    private IEnumerator GoblinComboRoutine(int direction)
+    {
+        animator.SetTrigger("Attack1");
+        yield return new WaitForSeconds(attack1Duration);
+
+        animator.SetTrigger("Attack2");
+
+        rb.linearVelocity = new Vector2(-direction * hopBackSpeed, rb.linearVelocity.y);
+        yield return new WaitForSeconds(hopBackDuration);
+
+        rb.linearVelocity = new Vector2(direction * lungeForwardSpeed, rb.linearVelocity.y);
+        yield return new WaitForSeconds(lungeDuration);
+
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+
+        stateTimer = attackCooldown;
+        currentState = State.Cooldown;
+    }
+
+    // --- METODO CHIAMATO DA ENEMYHEALTH ---
+    public void InterruptCombo()
+    {
+        StopAllCoroutines();
+
+        animator.ResetTrigger("Attack1");
+        animator.ResetTrigger("Attack2");
+
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+
+        stateTimer = 1.0f; // Pausa di 1 secondo dopo aver preso un colpo
+        currentState = State.Cooldown;
+    }
+
     public void TriggerAttackHit()
     {
         if (attackPoint == null) return;
 
-        Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(attackPoint.position, attackHitRadius, playerLayer);
+        // AGGIUNGI QUESTA RIGA:
+        Debug.Log("IL GOBLIN HA DATO UNA COLTELLATA!");
 
+        Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(attackPoint.position, attackHitRadius, playerLayer);
         foreach (Collider2D playerHit in hitPlayers)
         {
             PlayerHealth health = playerHit.GetComponent<PlayerHealth>();
-            if (health != null)
-            {
-                health.TakeDamage(attackDamage, transform);
-            }
+            if (health != null) health.TakeDamage(attackDamage, transform);
         }
     }
 
@@ -152,5 +192,10 @@ public class SkeletonAI : MonoBehaviour
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(attackPoint.position, attackHitRadius);
         }
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
     }
 }
