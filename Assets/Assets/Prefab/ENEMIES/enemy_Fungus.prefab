@@ -106,8 +106,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 56724757
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 4723107735738678597, guid: f8b30c2afe165d645b54d500a9c30862, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -291,6 +291,9 @@ MonoBehaviour:
   comboPause: 0.3
   heavyStepSpeed: 3
   attack2Duration: 0.6
+  hitsToEnrage: 3
+  armorDuration: 3.5
+  hasSuperArmor: 0
   player: {fileID: 0}
   animator: {fileID: 2659428056415462092}
 --- !u!114 &2907545661205889326

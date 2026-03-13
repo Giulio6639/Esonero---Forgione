@@ -127,7 +127,7 @@ MonoBehaviour:
   jumpForceX: 4
   jumpForceY: 3
   jumpDelay: 0.5
-  sightRange: 6
+  sightRange: 4
   attackRange: 2
   groundCheck: {fileID: 839471896768776809}
   groundLayer:
@@ -264,8 +264,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 56724757
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: -9074539206338946419, guid: c80534141f80d28489b1ef92f8ff7d99, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
