@@ -144,6 +144,11 @@ public class PlayerHealth : MonoBehaviour
         if (currentHealth > 0) playerController.isStunned = false;
     }
 
+    public bool IsAtMaxHealth()
+    {
+        return currentHealth >= maxHealth;
+    }
+
     private void Die()
     {
         animator.SetTrigger("Death");

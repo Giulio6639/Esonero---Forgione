@@ -28,9 +28,9 @@ public class WizardAI : MonoBehaviour
     [Header("Combattimento - Tempistiche Combo & Salto")]
     public float attack1Duration = 0.5f;
     public float attack2Duration = 0.6f;
-    public float jumpForceY = 12f;          // Forza verso l'alto del salto
-    public float jumpSpeedX = 6f;           // Velocità orizzontale per scavalcare il player
-    public float evadeCooldown = 6f;        // Ogni quanto può usare il salto acrobatico
+    public float jumpForceY = 12f;
+    public float jumpSpeedX = 6f;
+    public float evadeCooldown = 6f;
 
     [Header("Riferimenti")]
     public Transform player;
@@ -39,15 +39,29 @@ public class WizardAI : MonoBehaviour
     private Rigidbody2D rb;
     private bool facingRight = true;
 
+    // --- VARIABILI PER IL LAMPEGGIO ---
+    private SpriteRenderer spriteRenderer;
+    private Color originalColor;
+    // ----------------------------------
+
     private enum State { Idle, Wander, Chase, Attacking, Cooldown }
     private State currentState;
 
     private float stateTimer;
-    private float evadeTimer; // Timer separato per la schivata
+    private float evadeTimer;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        // --- PRENDIAMO IL COLORE INIZIALE ---
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+        }
+        // ------------------------------------
+
         currentState = State.Idle;
         stateTimer = Random.Range(1f, 2f);
 
@@ -63,9 +77,9 @@ public class WizardAI : MonoBehaviour
         // Gestione Timer
         if (evadeTimer > 0) evadeTimer -= Time.deltaTime;
 
-        if (currentState == State.Attacking) return; // Se sta attaccando/saltando, l'Update si ferma
-
-        // --- GESTIONE AUTOMATICA SALTO E CADUTA (Animazioni) ---
+        // --- FIX: SPOSTATO IN CIMA! ---
+        // Ora legge SEMPRE la gravità e aggiorna l'animator, 
+        // anche se sta facendo l'attacco speciale!
         if (rb.linearVelocity.y > 0.1f)
         {
             animator.SetBool("isJumping", true);
@@ -81,12 +95,15 @@ public class WizardAI : MonoBehaviour
             animator.SetBool("isJumping", false);
             animator.SetBool("isFalling", false);
         }
-        // -------------------------------------------------------
+        // ------------------------------
+
+        // Ora possiamo fermare il "cervello" AI senza bloccare le animazioni del corpo
+        if (currentState == State.Attacking) return;
 
         float distToPlayer = 100f;
         if (player != null) distToPlayer = Vector2.Distance(transform.position, player.position);
 
-        // IL RIFLESSO ASSOLUTO: Salta via se sei troppo vicino, a prescindere dallo stato
+        // IL RIFLESSO ASSOLUTO
         if (distToPlayer <= evadeRange && evadeTimer <= 0)
         {
             currentState = State.Attacking;
@@ -124,7 +141,6 @@ public class WizardAI : MonoBehaviour
             case State.Chase:
                 animator.SetBool("isRunning", true);
 
-                // CONTROLLO COMBO BASE (Fuori dal raggio di salto)
                 if (distToPlayer <= attackRange)
                 {
                     currentState = State.Attacking;
@@ -152,7 +168,6 @@ public class WizardAI : MonoBehaviour
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         animator.SetBool("isRunning", false);
 
-        // Spegne animazioni aeree per sicurezza
         animator.SetBool("isJumping", false);
         animator.SetBool("isFalling", false);
 
@@ -184,7 +199,6 @@ public class WizardAI : MonoBehaviour
         int newLookDir = player.position.x > transform.position.x ? 1 : -1;
         Flip(newLookDir);
 
-        // Disattiva isFalling altrimenti blocca l'attacco
         animator.SetBool("isFalling", false);
         animator.SetTrigger("Attack2");
 
@@ -198,28 +212,46 @@ public class WizardAI : MonoBehaviour
     public void InterruptCombo()
     {
         StopAllCoroutines();
+
+        // --- SICUREZZA LAMPEGGIO ---
+        // Se interrompiamo una Coroutine di lampeggio a metà, assicuriamoci 
+        // che il mago non rimanga bianco per sempre!
+        if (spriteRenderer != null) spriteRenderer.color = originalColor;
+
         animator.ResetTrigger("Attack1");
         animator.ResetTrigger("Attack2");
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         stateTimer = 1.0f;
         currentState = State.Cooldown;
+
+        // Fai partire il lampeggio per il colpo appena subito
+        StartCoroutine(FlashRoutine());
     }
 
-    // --- FUNZIONE HITBOX MULTIPLE AGGIORNATA ---
+    // --- COROUTINE DEL LAMPEGGIO ---
+    private IEnumerator FlashRoutine()
+    {
+        if (spriteRenderer != null)
+        {
+            // Diventa bianco (puoi usare Color.red se preferisci un flash rosso!)
+            spriteRenderer.color = Color.white;
+
+            // Aspetta un decimo di secondo (durata perfetta per un flash di impatto)
+            yield return new WaitForSeconds(0.1f);
+
+            // Torna normale
+            spriteRenderer.color = originalColor;
+        }
+    }
+
     public void TriggerAttackHit(int attackIndex)
     {
-        // --- MODIFICA FONDAMENTALE: AUTO-FLIPPING DINAMICO ALL'IMPATTO ---
-        // Essendo un mago intelligente, controlla la posizione del player
-        // un istante millesimale prima di attivare la hitbox.
-        // Se ti sei spostato sotto di lui durante l'animazione, si flippa al volo verso di te!
         if (player != null)
         {
             int lookDir = player.position.x > transform.position.x ? 1 : -1;
-            Flip(lookDir); // Si flippa istantaneamente per non sbagliare direzione
+            Flip(lookDir);
         }
-        // -----------------------------------------------------------------
 
-        // Sceglie il punto e il raggio giusti in base al numero passato dall'animazione
         Transform activePoint = (attackIndex == 1) ? attackPoint1 : attackPoint2;
         float activeRadius = (attackIndex == 1) ? attackHitRadius1 : attackHitRadius2;
 
@@ -253,7 +285,6 @@ public class WizardAI : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, evadeRange);
 
-        // Disegna entrambe le Hitbox per farti vedere dove colpirà!
         if (attackPoint1 != null)
         {
             Gizmos.color = Color.blue;

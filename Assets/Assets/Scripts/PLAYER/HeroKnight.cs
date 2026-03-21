@@ -16,10 +16,18 @@ public class HeroKnight : MonoBehaviour
     public float attackRadius = 0.6f;
     public LayerMask enemyLayer;
     public int attackDamage = 30;
-    public int comboExtraDamage = 20;  // Danno bonus per il terzo colpo
-    public float missCooldown = 0.6f;     // Quanto tempo rimani "scoperto" se manchi il colpo
-    private bool attackConnected = false; // Il semaforo: ha colpito qualcuno?
+    public int comboExtraDamage = 20;
+    public float missCooldown = 0.6f;
+    private bool attackConnected = false;
     public float attackActiveDuration = 0.15f;
+
+    // --- SEZIONE PROIETTILE SPADA AGGIORNATA ---
+    [Header("Sword Beam (Full Health)")]
+    public GameObject swordBeamPrefab;
+    public float beamSpeed = 10f;
+    public Transform beamSpawnPoint;
+    public float beamSpawnDelay = 0.1f; // NUOVO: Quanto tempo aspetta prima di sparare (in secondi)
+    // ---------------------------------------
 
     [Header("Schivata (Roll)")]
     public string playerLayerName = "Player";
@@ -30,7 +38,7 @@ public class HeroKnight : MonoBehaviour
     public bool isRollInvincible { get { return m_rolling && m_rollCurrentTime <= rollIFrames; } }
 
     [Header("Parry System")]
-    public float parryWindow = 0.25f; // Quanti secondi dura la finestra del Parry perfetto
+    public float parryWindow = 0.25f;
     private float parryTimer = 0f;
 
     [Header("Wall Jump")]
@@ -39,7 +47,6 @@ public class HeroKnight : MonoBehaviour
     public float wallJumpInputFreeze = 0.2f;
     private float wallJumpTimer = 0f;
 
-    // Metodi per permettere allo script della Salute di "leggere" questi stati
     public bool isBlocking { get { return m_blocking; } }
     public bool isParrying { get { return parryTimer > 0f; } }
     public int facingDirection { get { return m_facingDirection; } }
@@ -64,6 +71,8 @@ public class HeroKnight : MonoBehaviour
     private float m_rollDuration = 8.0f / 14.0f;
     private float m_rollCurrentTime;
 
+    private PlayerHealth playerHealth;
+
     void Start()
     {
         m_animator = GetComponent<Animator>();
@@ -73,6 +82,8 @@ public class HeroKnight : MonoBehaviour
         m_wallSensorR2 = transform.Find("WallSensor_R2").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
         m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
+
+        playerHealth = GetComponent<PlayerHealth>();
     }
 
     void Update()
@@ -113,12 +124,10 @@ public class HeroKnight : MonoBehaviour
         float inputX = Input.GetAxis("Horizontal");
         float rawInputX = Input.GetAxisRaw("Horizontal");
 
-        // --- 1. LEGGIAMO SUBITO I MURI ---
         bool touchingRightWall = m_wallSensorR1.State() && m_wallSensorR2.State();
         bool touchingLeftWall = m_wallSensorL1.State() && m_wallSensorL2.State();
         bool touchingWallInAir = !m_grounded && (touchingRightWall || touchingLeftWall);
 
-        // --- 2. GESTIONE SCIVOLATA ---
         m_isWallSliding = (touchingRightWall && rawInputX > 0) || (touchingLeftWall && rawInputX < 0);
         m_animator.SetBool("WallSlide", m_isWallSliding);
 
@@ -127,9 +136,6 @@ public class HeroKnight : MonoBehaviour
             m_body2d.linearVelocity = new Vector2(m_body2d.linearVelocity.x, Mathf.Max(m_body2d.linearVelocity.y, -2f));
         }
 
-        // --- 3. FLIP VISIVO (PROTETTO!) ---
-        // NON ti giri se stai toccando un muro a mezz'aria. Questo "congela" lo sguardo verso il muro
-        // finché non ti sei staccato fisicamente, nascondendo il glitch dell'animazione!
         if (m_timeSinceAttack >= 0.4f && wallJumpTimer <= 0 && !touchingWallInAir)
         {
             if (inputX > 0)
@@ -137,16 +143,17 @@ public class HeroKnight : MonoBehaviour
                 GetComponent<SpriteRenderer>().flipX = false;
                 m_facingDirection = 1;
                 if (attackPoint != null) attackPoint.localPosition = new Vector3(Mathf.Abs(attackPoint.localPosition.x), attackPoint.localPosition.y, attackPoint.localPosition.z);
+                if (beamSpawnPoint != null) beamSpawnPoint.localPosition = new Vector3(Mathf.Abs(beamSpawnPoint.localPosition.x), beamSpawnPoint.localPosition.y, beamSpawnPoint.localPosition.z);
             }
             else if (inputX < 0)
             {
                 GetComponent<SpriteRenderer>().flipX = true;
                 m_facingDirection = -1;
                 if (attackPoint != null) attackPoint.localPosition = new Vector3(-Mathf.Abs(attackPoint.localPosition.x), attackPoint.localPosition.y, attackPoint.localPosition.z);
+                if (beamSpawnPoint != null) beamSpawnPoint.localPosition = new Vector3(-Mathf.Abs(beamSpawnPoint.localPosition.x), beamSpawnPoint.localPosition.y, beamSpawnPoint.localPosition.z);
             }
         }
 
-        // --- 4. MOVIMENTO ---
         if (!m_rolling)
         {
             if (m_blocking || (m_grounded && m_timeSinceAttack < 0.4f))
@@ -167,7 +174,6 @@ public class HeroKnight : MonoBehaviour
             m_animator.SetTrigger("Death");
         }
 
-        // --- 5. AZIONI (Combattimento, Roll, Salti) ---
         float requiredCooldown = (attackConnected || m_timeSinceAttack > 1.0f) ? 0.25f : missCooldown;
 
         if (Input.GetMouseButtonDown(0) && m_timeSinceAttack >= requiredCooldown && !m_rolling && !m_blocking)
@@ -180,6 +186,13 @@ public class HeroKnight : MonoBehaviour
             }
 
             m_animator.SetTrigger("Attack" + m_currentAttack);
+
+            // --- CHIAMATA ALLA NUOVA COROUTINE CON RITARDO ---
+            if (m_currentAttack == 1 && swordBeamPrefab != null && playerHealth != null && playerHealth.IsAtMaxHealth())
+            {
+                StartCoroutine(ShootSwordBeamRoutine());
+            }
+
             m_timeSinceAttack = 0.0f;
             attackConnected = false;
         }
@@ -217,9 +230,6 @@ public class HeroKnight : MonoBehaviour
             m_body2d.linearVelocity = new Vector2(m_body2d.linearVelocity.x, m_jumpForce);
             m_groundSensor.Disable(0.2f);
         }
-
-        // --- WALL JUMP (Migliorato col Coyote Time!) ---
-        // Ora puoi saltare anche se hai appena premuto la direzione opposta, basta che stai toccando il muro
         else if (Input.GetKeyDown("space") && touchingWallInAir && !m_grounded && !m_rolling)
         {
             int wallDir = touchingRightWall ? 1 : -1;
@@ -227,14 +237,11 @@ public class HeroKnight : MonoBehaviour
             m_body2d.linearVelocity = new Vector2(-wallDir * wallJumpForceX, wallJumpForceY);
             wallJumpTimer = wallJumpInputFreeze;
 
-            // Forza l'orientamento corretto subito
             GetComponent<SpriteRenderer>().flipX = (wallDir == 1);
             m_facingDirection = -wallDir;
 
-            if (attackPoint != null)
-            {
-                attackPoint.localPosition = new Vector3(m_facingDirection * Mathf.Abs(attackPoint.localPosition.x), attackPoint.localPosition.y, attackPoint.localPosition.z);
-            }
+            if (attackPoint != null) attackPoint.localPosition = new Vector3(m_facingDirection * Mathf.Abs(attackPoint.localPosition.x), attackPoint.localPosition.y, attackPoint.localPosition.z);
+            if (beamSpawnPoint != null) beamSpawnPoint.localPosition = new Vector3(m_facingDirection * Mathf.Abs(beamSpawnPoint.localPosition.x), beamSpawnPoint.localPosition.y, beamSpawnPoint.localPosition.z);
 
             m_animator.SetTrigger("Jump");
             m_isWallSliding = false;
@@ -249,6 +256,40 @@ public class HeroKnight : MonoBehaviour
             m_delayToIdle -= Time.deltaTime;
             if (m_delayToIdle < 0)
                 m_animator.SetInteger("AnimState", 0);
+        }
+    }
+
+    // --- NUOVA COROUTINE PER IL RITARDO ---
+    private IEnumerator ShootSwordBeamRoutine()
+    {
+        // Aspetta il tempo definito nella variabile in alto
+        yield return new WaitForSeconds(beamSpawnDelay);
+
+        // Dopodiché spara!
+        ShootSwordBeam();
+    }
+    // --------------------------------------
+
+    void ShootSwordBeam()
+    {
+        Transform spawnPointToUse = (beamSpawnPoint != null) ? beamSpawnPoint : attackPoint;
+
+        if (spawnPointToUse == null) return;
+
+        GameObject beam = Instantiate(swordBeamPrefab, spawnPointToUse.position, Quaternion.identity);
+
+        Rigidbody2D beamRb = beam.GetComponent<Rigidbody2D>();
+
+        if (beamRb != null)
+        {
+            beamRb.linearVelocity = new Vector2(m_facingDirection * beamSpeed, 0);
+
+            if (m_facingDirection < 0)
+            {
+                Vector3 scale = beam.transform.localScale;
+                scale.x *= -1;
+                beam.transform.localScale = scale;
+            }
         }
     }
 
@@ -301,6 +342,12 @@ public class HeroKnight : MonoBehaviour
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
+        }
+
+        if (beamSpawnPoint != null)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawSphere(beamSpawnPoint.position, 0.15f);
         }
     }
 
