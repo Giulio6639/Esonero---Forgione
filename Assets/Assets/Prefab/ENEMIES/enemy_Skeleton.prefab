@@ -272,7 +272,7 @@ MonoBehaviour:
   sightRange: 5
   attackRange: 2.5
   attackPoint: {fileID: 1289905483536525759}
-  attackHitRadius: 0.5
+  attackHitRadius: 0.7
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
