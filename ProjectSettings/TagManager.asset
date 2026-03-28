@@ -6,6 +6,10 @@ TagManager:
   tags:
   - ManaSprite
   - HealthSprite
+  - LeftStairs
+  - RightStairs
+  - StairsRight
+  - StairsLeft
   layers:
   - Default
   - TransparentFX
