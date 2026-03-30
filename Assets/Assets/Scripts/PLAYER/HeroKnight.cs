@@ -21,16 +21,20 @@ public class HeroKnight : MonoBehaviour
     private bool attackConnected = false;
     public float attackActiveDuration = 0.15f;
 
-    // --- SEZIONE PROIETTILE SPADA AGGIORNATA ---
     [Header("Sword Beam (Full Health)")]
     public GameObject swordBeamPrefab;
     public float beamSpeed = 10f;
     public Transform beamSpawnPoint;
-    public float beamSpawnDelay = 0.1f; // NUOVO: Quanto tempo aspetta prima di sparare (in secondi)
-    // ---------------------------------------
+    public float beamSpawnDelay = 0.1f;
+
+    [Header("Sensori (Raycast & Slopes)")]
+    public LayerMask groundLayer;
+    public string stairsLayerName = "Stairs";
+    public float dropThroughTime = 0.6f;
+    public float wallCheckDistance = 0.4f;
+    public float wallCheckHeight = 0.5f;
 
     [Header("Schivata (Roll)")]
-    public string playerLayerName = "Player";
     public string enemyLayerName = "Enemy";
     public float rollIFrames = 0.3f;
     public float rollCooldown = 0.8f;
@@ -50,18 +54,13 @@ public class HeroKnight : MonoBehaviour
     public bool isBlocking { get { return m_blocking; } }
     public bool isParrying { get { return parryTimer > 0f; } }
     public int facingDirection { get { return m_facingDirection; } }
-
     public bool isStunned = false;
 
     private Animator m_animator;
     private Rigidbody2D m_body2d;
-    private Sensor_HeroKnight m_groundSensor;
-    private Sensor_HeroKnight m_wallSensorR1;
-    private Sensor_HeroKnight m_wallSensorR2;
-    private Sensor_HeroKnight m_wallSensorL1;
-    private Sensor_HeroKnight m_wallSensorL2;
+
     private bool m_isWallSliding = false;
-    private bool m_grounded = false;
+    public bool m_grounded = false;
     private bool m_rolling = false;
     private bool m_blocking = false;
     private int m_facingDirection = 1;
@@ -70,20 +69,40 @@ public class HeroKnight : MonoBehaviour
     private float m_delayToIdle = 0.0f;
     private float m_rollDuration = 8.0f / 14.0f;
     private float m_rollCurrentTime;
+    private float defaultGravity;
 
     private PlayerHealth playerHealth;
+    private Collider2D playerCol;
+
+    // Variabili Layer e Scale
+    private int playerLayerID;
+    private int stairsLayerID;
+    private bool isDroppingThrough = false;
 
     void Start()
     {
         m_animator = GetComponent<Animator>();
         m_body2d = GetComponent<Rigidbody2D>();
-        m_groundSensor = transform.Find("GroundSensor").GetComponent<Sensor_HeroKnight>();
-        m_wallSensorR1 = transform.Find("WallSensor_R1").GetComponent<Sensor_HeroKnight>();
-        m_wallSensorR2 = transform.Find("WallSensor_R2").GetComponent<Sensor_HeroKnight>();
-        m_wallSensorL1 = transform.Find("WallSensor_L1").GetComponent<Sensor_HeroKnight>();
-        m_wallSensorL2 = transform.Find("WallSensor_L2").GetComponent<Sensor_HeroKnight>();
-
         playerHealth = GetComponent<PlayerHealth>();
+        playerCol = GetComponent<Collider2D>();
+
+        defaultGravity = m_body2d.gravityScale;
+
+        // IL FIX AUTOMATICO: Prende il Layer reale del tuo GameObject senza che tu debba scriverlo!
+        playerLayerID = gameObject.layer;
+        stairsLayerID = LayerMask.NameToLayer(stairsLayerName);
+
+        if (stairsLayerID == -1)
+        {
+            Debug.LogError("ATTENZIONE: Non esiste nessun Layer chiamato 'Stairs'. Crealo in alto a destra su Unity!");
+        }
+    }
+    public bool canInteract
+    {
+        get
+        {
+            return m_grounded && !m_rolling && !m_blocking && !isStunned && (m_timeSinceAttack >= 0.4f) && !isDroppingThrough;
+        }
     }
 
     void Update()
@@ -96,16 +115,89 @@ public class HeroKnight : MonoBehaviour
             if (m_rollCurrentTime > m_rollDuration)
             {
                 m_rolling = false;
-                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer(playerLayerName), LayerMask.NameToLayer(enemyLayerName), false);
+                Physics2D.IgnoreLayerCollision(playerLayerID, LayerMask.NameToLayer(enemyLayerName), false);
             }
+
+
         }
 
-        if (!m_grounded && m_groundSensor.State())
+        // --- LA MASCHERA DINAMICA ---
+        bool isGhostToStairs = false;
+        if (stairsLayerID != -1)
+        {
+            isGhostToStairs = Physics2D.GetIgnoreLayerCollision(playerLayerID, stairsLayerID);
+        }
+
+        int currentGroundMask = groundLayer.value;
+        if (isGhostToStairs && stairsLayerID != -1)
+        {
+            // Se siamo fantasma, rimuoviamo le scale dalla vista dei sensori
+            currentGroundMask &= ~(1 << stairsLayerID);
+        }
+        // ----------------------------
+
+        // --- CALCOLO SENSORI ---
+        Vector2 groundCheckPos = new Vector2(playerCol.bounds.center.x, playerCol.bounds.min.y + 0.1f);
+        Vector2 groundCheckSize = new Vector2(playerCol.bounds.size.x * 0.5f, 0.3f);
+        RaycastHit2D groundHit = Physics2D.BoxCast(groundCheckPos, groundCheckSize, 0f, Vector2.down, 0.3f, currentGroundMask);
+        bool isGroundedNow = groundHit.collider != null;
+
+        RaycastHit2D slopeHit = Physics2D.Raycast(new Vector2(playerCol.bounds.center.x, playerCol.bounds.min.y + 0.2f), Vector2.down, 0.7f, currentGroundMask);
+        bool isOnSlope = slopeHit.collider != null && slopeHit.normal.y < 0.99f && slopeHit.normal.y > 0.1f;
+
+        if (!isGroundedNow || !isOnSlope) m_body2d.gravityScale = defaultGravity;
+
+        // --- LA MAGIA DELL'ATTRAVERSAMENTO SCALE ---
+        if (stairsLayerID != -1)
+        {
+            if (isDroppingThrough)
+            {
+                Physics2D.IgnoreLayerCollision(playerLayerID, stairsLayerID, true);
+            }
+            else
+            {
+                bool isJumpingUp = m_body2d.linearVelocity.y > 0.1f && !m_grounded;
+                bool isFalling = m_body2d.linearVelocity.y < -0.1f && !m_grounded;
+
+                if (isJumpingUp)
+                {
+                    Physics2D.IgnoreLayerCollision(playerLayerID, stairsLayerID, true);
+                }
+                else if (isFalling)
+                {
+                    Physics2D.IgnoreLayerCollision(playerLayerID, stairsLayerID, false);
+                }
+                else if (m_grounded && !isOnSlope)
+                {
+                    Physics2D.IgnoreLayerCollision(playerLayerID, stairsLayerID, true);
+                }
+            }
+        }
+        // -------------------------------------------
+
+        float centerY = playerCol.bounds.center.y;
+        Vector2 topWallPos = new Vector2(transform.position.x, centerY + wallCheckHeight);
+        Vector2 botWallPos = new Vector2(transform.position.x, centerY - wallCheckHeight + 0.2f);
+
+        bool touchingRightWall = Physics2D.Raycast(topWallPos, Vector2.right, wallCheckDistance, currentGroundMask) &&
+                                 Physics2D.Raycast(botWallPos, Vector2.right, wallCheckDistance, currentGroundMask);
+
+        bool touchingLeftWall = Physics2D.Raycast(topWallPos, Vector2.left, wallCheckDistance, currentGroundMask) &&
+                                 Physics2D.Raycast(botWallPos, Vector2.left, wallCheckDistance, currentGroundMask);
+
+        // --- SCENDERE DALLE SCALE CON 'S' ---
+        if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && m_grounded && !m_rolling)
+        {
+            StartCoroutine(DropThroughStairsRoutine());
+        }
+        // ------------------------------------
+
+        if (!m_grounded && isGroundedNow)
         {
             m_grounded = true;
             m_animator.SetBool("Grounded", m_grounded);
         }
-        if (m_grounded && !m_groundSensor.State())
+        if (m_grounded && !isGroundedNow)
         {
             m_grounded = false;
             m_animator.SetBool("Grounded", m_grounded);
@@ -124,8 +216,6 @@ public class HeroKnight : MonoBehaviour
         float inputX = Input.GetAxis("Horizontal");
         float rawInputX = Input.GetAxisRaw("Horizontal");
 
-        bool touchingRightWall = m_wallSensorR1.State() && m_wallSensorR2.State();
-        bool touchingLeftWall = m_wallSensorL1.State() && m_wallSensorL2.State();
         bool touchingWallInAir = !m_grounded && (touchingRightWall || touchingLeftWall);
 
         m_isWallSliding = (touchingRightWall && rawInputX > 0) || (touchingLeftWall && rawInputX < 0);
@@ -159,10 +249,32 @@ public class HeroKnight : MonoBehaviour
             if (m_blocking || (m_grounded && m_timeSinceAttack < 0.4f))
             {
                 m_body2d.linearVelocity = new Vector2(0, m_body2d.linearVelocity.y);
+                if (isOnSlope) m_body2d.gravityScale = 0f;
             }
             else if (wallJumpTimer <= 0)
             {
-                m_body2d.linearVelocity = new Vector2(inputX * m_speed, m_body2d.linearVelocity.y);
+                float targetVelX = inputX * m_speed;
+                float targetVelY = m_body2d.linearVelocity.y;
+
+                if (m_grounded && isOnSlope)
+                {
+                    if (Mathf.Abs(inputX) < 0.01f)
+                    {
+                        targetVelX = 0f;
+                        targetVelY = 0f;
+                        m_body2d.gravityScale = 0f;
+                    }
+                    else
+                    {
+                        m_body2d.gravityScale = defaultGravity;
+                        Vector2 slopePerp = new Vector2(slopeHit.normal.y, -slopeHit.normal.x);
+                        targetVelX = slopePerp.x * inputX * m_speed;
+                        targetVelY = slopePerp.y * inputX * m_speed;
+                        if (targetVelY < 0) targetVelY -= 2f;
+                    }
+                }
+
+                m_body2d.linearVelocity = new Vector2(targetVelX, targetVelY);
             }
         }
 
@@ -187,7 +299,6 @@ public class HeroKnight : MonoBehaviour
 
             m_animator.SetTrigger("Attack" + m_currentAttack);
 
-            // --- CHIAMATA ALLA NUOVA COROUTINE CON RITARDO ---
             if (m_currentAttack == 1 && swordBeamPrefab != null && playerHealth != null && playerHealth.IsAtMaxHealth())
             {
                 StartCoroutine(ShootSwordBeamRoutine());
@@ -216,19 +327,20 @@ public class HeroKnight : MonoBehaviour
         else if (Input.GetKeyDown("left shift") && !m_rolling && !m_isWallSliding && !m_blocking && rollCooldownTimer <= 0f)
         {
             m_rolling = true;
+            m_body2d.gravityScale = defaultGravity;
             m_rollCurrentTime = 0f;
             rollCooldownTimer = rollCooldown;
             m_animator.SetTrigger("Roll");
             m_body2d.linearVelocity = new Vector2(m_facingDirection * m_rollForce, m_body2d.linearVelocity.y);
-            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer(playerLayerName), LayerMask.NameToLayer(enemyLayerName), true);
+            Physics2D.IgnoreLayerCollision(playerLayerID, LayerMask.NameToLayer(enemyLayerName), true);
         }
         else if (Input.GetKeyDown("space") && m_grounded && !m_rolling && m_timeSinceAttack >= 0.4f && !m_blocking)
         {
             m_animator.SetTrigger("Jump");
             m_grounded = false;
+            m_body2d.gravityScale = defaultGravity;
             m_animator.SetBool("Grounded", m_grounded);
             m_body2d.linearVelocity = new Vector2(m_body2d.linearVelocity.x, m_jumpForce);
-            m_groundSensor.Disable(0.2f);
         }
         else if (Input.GetKeyDown("space") && touchingWallInAir && !m_grounded && !m_rolling)
         {
@@ -259,31 +371,29 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
-    // --- NUOVA COROUTINE PER IL RITARDO ---
+    private IEnumerator DropThroughStairsRoutine()
+    {
+        isDroppingThrough = true;
+        yield return new WaitForSeconds(dropThroughTime);
+        isDroppingThrough = false;
+    }
+
     private IEnumerator ShootSwordBeamRoutine()
     {
-        // Aspetta il tempo definito nella variabile in alto
         yield return new WaitForSeconds(beamSpawnDelay);
-
-        // Dopodiché spara!
         ShootSwordBeam();
     }
-    // --------------------------------------
 
     void ShootSwordBeam()
     {
         Transform spawnPointToUse = (beamSpawnPoint != null) ? beamSpawnPoint : attackPoint;
-
         if (spawnPointToUse == null) return;
-
         GameObject beam = Instantiate(swordBeamPrefab, spawnPointToUse.position, Quaternion.identity);
-
         Rigidbody2D beamRb = beam.GetComponent<Rigidbody2D>();
 
         if (beamRb != null)
         {
             beamRb.linearVelocity = new Vector2(m_facingDirection * beamSpeed, 0);
-
             if (m_facingDirection < 0)
             {
                 Vector3 scale = beam.transform.localScale;
@@ -295,9 +405,10 @@ public class HeroKnight : MonoBehaviour
 
     void AE_SlideDust()
     {
-        if (m_slideDust != null && m_groundSensor != null)
+        if (m_slideDust != null && playerCol != null)
         {
-            Vector3 spawnPosition = m_groundSensor.transform.position;
+            Vector3 spawnPosition = transform.position;
+            spawnPosition.y -= playerCol.bounds.extents.y;
             spawnPosition.x -= m_facingDirection * 0.3f;
             GameObject dust = Instantiate(m_slideDust, spawnPosition, gameObject.transform.localRotation) as GameObject;
             dust.transform.localScale = new Vector3(-m_facingDirection, 1, 1);
@@ -343,16 +454,37 @@ public class HeroKnight : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
         }
-
         if (beamSpawnPoint != null)
         {
             Gizmos.color = Color.cyan;
             Gizmos.DrawSphere(beamSpawnPoint.position, 0.15f);
         }
+
+        Collider2D col = GetComponent<Collider2D>();
+        if (col == null) return;
+
+        Gizmos.color = Color.green;
+        Vector2 groundPos = new Vector2(col.bounds.center.x, col.bounds.min.y + 0.1f);
+        Vector2 groundSize = new Vector2(col.bounds.size.x * 0.5f, 0.3f);
+        Gizmos.DrawWireCube(groundPos + Vector2.down * 0.15f, groundSize);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(new Vector2(col.bounds.center.x, col.bounds.min.y + 0.2f), new Vector2(col.bounds.center.x, col.bounds.min.y - 0.5f));
+
+        Gizmos.color = Color.yellow;
+        float centerY = col.bounds.center.y;
+        Vector2 topPos = new Vector2(transform.position.x, centerY + wallCheckHeight);
+        Vector2 botPos = new Vector2(transform.position.x, centerY - wallCheckHeight + 0.2f);
+
+        Gizmos.DrawLine(topPos, topPos + Vector2.right * wallCheckDistance);
+        Gizmos.DrawLine(botPos, botPos + Vector2.right * wallCheckDistance);
+        Gizmos.DrawLine(topPos, topPos + Vector2.left * wallCheckDistance);
+        Gizmos.DrawLine(botPos, botPos + Vector2.left * wallCheckDistance);
     }
 
     private void OnDisable()
     {
-        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer(playerLayerName), LayerMask.NameToLayer(enemyLayerName), false);
+        Physics2D.IgnoreLayerCollision(playerLayerID, LayerMask.NameToLayer(enemyLayerName), false);
     }
+    
 }
