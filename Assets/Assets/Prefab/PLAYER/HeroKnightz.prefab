@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 3554232927925011669}
   - component: {fileID: 6981859684473223624}
   - component: {fileID: 1494774327963188794}
+  - component: {fileID: 442761365440221526}
   - component: {fileID: 2404158322562813787}
   - component: {fileID: 5797060889803392944}
   - component: {fileID: 961194652051280535}
@@ -107,7 +108,6 @@ MonoBehaviour:
   dropThroughTime: 0.6
   wallCheckDistance: 0.4
   wallCheckHeight: 0.5
-  playerLayerName: Player
   enemyLayerName: Enemy
   rollIFrames: 0.3
   rollCooldown: 0.8
@@ -194,6 +194,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &442761365440221526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2828473212976238109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8392de0756f1bc243989f300fc5cb402, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!50 &2404158322562813787
 Rigidbody2D:
   serializedVersion: 5
@@ -281,6 +293,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
+  startingLives: 3
+  currentLives: 0
+  respawnPoint: {fileID: 0}
   healthBarFill: {fileID: 0}
   iFramesDuration: 0.35
   knockbackForceX: 3

@@ -107,6 +107,8 @@ public class HeroKnight : MonoBehaviour
 
     void Update()
     {
+        if (Time.timeScale == 0f) return;
+
         m_timeSinceAttack += Time.deltaTime;
 
         if (m_rolling)

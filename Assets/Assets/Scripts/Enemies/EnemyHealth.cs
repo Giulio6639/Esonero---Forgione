@@ -54,17 +54,18 @@ public class EnemyHealth : MonoBehaviour
         FungusAI fungusAI = GetComponent<FungusAI>();
         if (fungusAI != null)
         {
-            // Passa il danno all'IA per contare i colpi
             fungusAI.InterruptCombo();
-            // Se il fungo si è appena arrabbiato o lo era già, diciamo a questo script di ignorare lo stordimento
             if (fungusAI.hasSuperArmor) ignoreStun = true;
             fungusAI.PlayFlashEffect();
         }
         // ----------------------------------------
 
+        // Interrompi le combo degli altri nemici
         GoblinAI goblinAI = GetComponent<GoblinAI>();
         if (goblinAI != null) goblinAI.InterruptCombo();
 
+        WizardAI wizardAI = GetComponent<WizardAI>();
+        if (wizardAI != null) wizardAI.InterruptCombo();
 
         if (currentHealth <= 0)
         {
@@ -72,11 +73,9 @@ public class EnemyHealth : MonoBehaviour
         }
         else
         {
-            // Se ha la Super Armor, salta il knockback e l'animazione!
             if (ignoreStun)
             {
-                // Il nemico prende danno, ma non si ferma!
-                return;
+                return; // Il nemico prende danno, ma non si ferma!
             }
 
             animator.SetTrigger("Hurt");
@@ -86,8 +85,9 @@ public class EnemyHealth : MonoBehaviour
 
     private IEnumerator HitReaction(Transform attacker, bool applyKnockback)
     {
-        // Disabilita lo script AI per lo stordimento (se non è un nemico che si gestisce da solo)
-        if (aiScript != null && GetComponent<GoblinAI>() == null && GetComponent<FungusAI>() == null) aiScript.enabled = false;
+        // Disabilita lo script AI per lo stordimento (ignorando quelli che si gestiscono da soli)
+        if (aiScript != null && GetComponent<GoblinAI>() == null && GetComponent<FungusAI>() == null && GetComponent<WizardAI>() == null)
+            aiScript.enabled = false;
 
         if (applyKnockback)
         {
@@ -102,7 +102,7 @@ public class EnemyHealth : MonoBehaviour
         yield return new WaitForSeconds(knockbackDuration);
 
         // Riabilita
-        if (currentHealth > 0 && aiScript != null && GetComponent<GoblinAI>() == null && GetComponent<FungusAI>() == null)
+        if (currentHealth > 0 && aiScript != null && GetComponent<GoblinAI>() == null && GetComponent<FungusAI>() == null && GetComponent<WizardAI>() == null)
         {
             aiScript.enabled = true;
         }
@@ -110,10 +110,9 @@ public class EnemyHealth : MonoBehaviour
 
     private void Die()
     {
-        // 1. Torniamo a usare il Bool!
         if (animator != null) animator.SetBool("isDead", true);
 
-        // ... resto del codice identico a prima ...
+        // Spegni tutte le IA possibili
         GoblinAI goblin = GetComponent<GoblinAI>();
         if (goblin != null) goblin.enabled = false;
 
@@ -123,21 +122,39 @@ public class EnemyHealth : MonoBehaviour
         FungusAI fungus = GetComponent<FungusAI>();
         if (fungus != null) fungus.enabled = false;
 
+        WizardAI wizard = GetComponent<WizardAI>();
+        if (wizard != null) wizard.enabled = false;
+
         if (aiScript != null) aiScript.enabled = false;
 
+        // Blocca il corpo
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
             rb.bodyType = RigidbodyType2D.Kinematic;
         }
 
+        // Spegni i collider
         Collider2D[] allColliders = GetComponentsInChildren<Collider2D>();
         foreach (Collider2D col in allColliders)
         {
             col.enabled = false;
         }
 
-        StartCoroutine(DisappearRoutine());
+        // --- IL BIVIO DEL BOSS ---
+        // Controlla se questo nemico è il Boss (ha lo script BossDefeated attaccato)
+        BossDefeated bossScript = GetComponent<BossDefeated>();
+        if (bossScript != null)
+        {
+            // Se è il boss, avvia il caricamento della scena. 
+            // NON chiamiamo DisappearRoutine perché distruggerebbe il GameObject bloccando il caricamento!
+            bossScript.TriggerBossDeath();
+        }
+        else
+        {
+            // Se è un nemico normale, fallo sparire normalmente
+            StartCoroutine(DisappearRoutine());
+        }
     }
 
     private IEnumerator DisappearRoutine()
