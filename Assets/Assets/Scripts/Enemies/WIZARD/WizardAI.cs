@@ -42,6 +42,7 @@ public class WizardAI : MonoBehaviour
     // --- VARIABILI PER IL LAMPEGGIO ---
     private SpriteRenderer spriteRenderer;
     private Color originalColor;
+    private Coroutine flashCoroutine; // Per evitare accavallamenti di lampeggi
     // ----------------------------------
 
     private enum State { Idle, Wander, Chase, Attacking, Cooldown }
@@ -50,17 +51,23 @@ public class WizardAI : MonoBehaviour
     private float stateTimer;
     private float evadeTimer;
 
+    // --- NUOVA PROPRIETÀ SUPER ARMOR ---
+    // Ritorna "vero" solo se il mago sta attualmente attaccando
+    public bool hasSuperArmor
+    {
+        get { return currentState == State.Attacking; }
+    }
+    // -----------------------------------
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // --- PRENDIAMO IL COLORE INIZIALE ---
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         if (spriteRenderer != null)
         {
             originalColor = spriteRenderer.color;
         }
-        // ------------------------------------
 
         currentState = State.Idle;
         stateTimer = Random.Range(1f, 2f);
@@ -74,12 +81,8 @@ public class WizardAI : MonoBehaviour
 
     void Update()
     {
-        // Gestione Timer
         if (evadeTimer > 0) evadeTimer -= Time.deltaTime;
 
-        // --- FIX: SPOSTATO IN CIMA! ---
-        // Ora legge SEMPRE la gravità e aggiorna l'animator, 
-        // anche se sta facendo l'attacco speciale!
         if (rb.linearVelocity.y > 0.1f)
         {
             animator.SetBool("isJumping", true);
@@ -95,15 +98,12 @@ public class WizardAI : MonoBehaviour
             animator.SetBool("isJumping", false);
             animator.SetBool("isFalling", false);
         }
-        // ------------------------------
 
-        // Ora possiamo fermare il "cervello" AI senza bloccare le animazioni del corpo
         if (currentState == State.Attacking) return;
 
         float distToPlayer = 100f;
         if (player != null) distToPlayer = Vector2.Distance(transform.position, player.position);
 
-        // IL RIFLESSO ASSOLUTO
         if (distToPlayer <= evadeRange && evadeTimer <= 0)
         {
             currentState = State.Attacking;
@@ -213,9 +213,6 @@ public class WizardAI : MonoBehaviour
     {
         StopAllCoroutines();
 
-        // --- SICUREZZA LAMPEGGIO ---
-        // Se interrompiamo una Coroutine di lampeggio a metà, assicuriamoci 
-        // che il mago non rimanga bianco per sempre!
         if (spriteRenderer != null) spriteRenderer.color = originalColor;
 
         animator.ResetTrigger("Attack1");
@@ -224,8 +221,14 @@ public class WizardAI : MonoBehaviour
         stateTimer = 1.0f;
         currentState = State.Cooldown;
 
-        // Fai partire il lampeggio per il colpo appena subito
-        StartCoroutine(FlashRoutine());
+        PlayFlashEffect(); // Richiama la funzione centralizzata
+    }
+
+    // --- NUOVA FUNZIONE PUBBLICA PER IL LAMPEGGIO ---
+    public void PlayFlashEffect()
+    {
+        if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+        flashCoroutine = StartCoroutine(FlashRoutine());
     }
 
     // --- COROUTINE DEL LAMPEGGIO ---
@@ -233,16 +236,17 @@ public class WizardAI : MonoBehaviour
     {
         if (spriteRenderer != null)
         {
-            // Diventa bianco (puoi usare Color.red se preferisci un flash rosso!)
-            spriteRenderer.color = Color.white;
+            // Usiamo il Rosso! È il colore standard universale per i danni nei videogiochi
+            spriteRenderer.color = Color.red;
 
-            // Aspetta un decimo di secondo (durata perfetta per un flash di impatto)
+            // Aspetta un decimo di secondo
             yield return new WaitForSeconds(0.1f);
 
             // Torna normale
             spriteRenderer.color = originalColor;
         }
     }
+    // ------------------------------------------------
 
     public void TriggerAttackHit(int attackIndex)
     {

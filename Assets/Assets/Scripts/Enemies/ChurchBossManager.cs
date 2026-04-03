@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class ChurchBossManager : MonoBehaviour, ITalkable
@@ -8,6 +9,7 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
     public GameObject bossGameObject;
     public WizardAI bossAI;
     public EnemyHealth bossHealth;
+    private Rigidbody2D bossRb;
 
     [Header("Riferimenti Dialoghi")]
     public DialogueController dialogueController;
@@ -17,25 +19,35 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
     [Header("Impostazioni Uscita")]
     public string sceneToLoadAfterBoss = "Level02";
 
-    private bool isBossDead = false;
-    private bool sequenceStarted = false;
+    private enum RoomState { Dormant, IntroDialogue, Fighting, OutroDialogue, Dying }
+    private RoomState currentState = RoomState.Dormant;
+
     private DialogueText currentActiveDialogue = null;
 
     void Start()
     {
-        // Setup iniziale: Boss congelato
+        // Controlli anti-crash iniziali
         if (bossAI != null) bossAI.enabled = false;
         if (bossHealth != null) bossHealth.enabled = false;
-        if (bossGameObject != null && bossGameObject.GetComponent<Rigidbody2D>())
-            bossGameObject.GetComponent<Rigidbody2D>().simulated = false;
+
+        if (bossGameObject != null)
+        {
+            bossRb = bossGameObject.GetComponent<Rigidbody2D>();
+            if (bossRb != null) bossRb.simulated = false;
+        }
+        else
+        {
+            Debug.LogError("ERRORE FATALE: Non hai trascinato il Mago nello slot 'Boss Game Object' del Manager!");
+        }
     }
 
-    // Chiamata dallo script "Ponte"
     public void StartBossSequence()
     {
-        if (!sequenceStarted)
+        Debug.Log("Il Manager ha ricevuto il segnale! Stato attuale: " + currentState); // LOG 2
+
+        if (currentState == RoomState.Dormant)
         {
-            sequenceStarted = true;
+            currentState = RoomState.IntroDialogue;
             StartCoroutine(StartIntroRoutine());
         }
     }
@@ -43,59 +55,81 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
     private IEnumerator StartIntroRoutine()
     {
         yield return new WaitForSeconds(0.5f);
+        Debug.Log("Faccio partire il Dialogo Iniziale!"); // LOG 3
+
         currentActiveDialogue = introDialogue;
         Talk(introDialogue);
     }
 
     void Update()
     {
-        // --- GESTIONE TASTO E PER DIALOGHI ---
         if (currentActiveDialogue != null)
         {
-            // Keyboard.current funziona anche con Time.timeScale = 0
             if (Keyboard.current.eKey.wasPressedThisFrame)
             {
-                Debug.Log("Tasto E premuto nella cutscene!");
                 Talk(currentActiveDialogue);
             }
 
-            // Se il canvas del dialogo viene spento dal DialogueController, abbiamo finito
             if (dialogueController != null && !dialogueController.gameObject.activeSelf)
             {
                 currentActiveDialogue = null;
+
+                if (currentState == RoomState.IntroDialogue)
+                {
+                    currentState = RoomState.Fighting;
+                    if (bossAI != null) bossAI.enabled = true;
+                    if (bossHealth != null) bossHealth.enabled = true;
+                    if (bossRb != null) bossRb.simulated = true;
+                    Debug.Log("IL MAGO SI SVEGLIA! BATTAGLIA INIZIATA!");
+                }
+                else if (currentState == RoomState.OutroDialogue)
+                {
+                    currentState = RoomState.Dying;
+                    StartCoroutine(FinalDeathSequence());
+                }
             }
-            return; // Blocca il resto finché parliamo
+            return;
         }
 
-        // --- ATTIVAZIONE BOSS ---
-        if (sequenceStarted && bossAI != null && !bossAI.enabled && Time.timeScale == 1f && !isBossDead)
+        if (currentState == RoomState.Fighting && bossHealth != null && bossHealth.currentHealth <= 0)
         {
-            bossAI.enabled = true;
-            bossHealth.enabled = true;
-            if (bossGameObject.GetComponent<Rigidbody2D>())
-                bossGameObject.GetComponent<Rigidbody2D>().simulated = true;
-        }
-
-        // --- CONTROLLO MORTE ---
-        if (bossHealth != null && bossHealth.currentHealth <= 0 && !isBossDead)
-        {
-            isBossDead = true;
-            StartCoroutine(BossDeathSequenceRoutine());
+            currentState = RoomState.OutroDialogue;
+            Time.timeScale = 0f;
+            currentActiveDialogue = outroDialogue;
+            Talk(outroDialogue);
         }
     }
 
-    private IEnumerator BossDeathSequenceRoutine()
+    private IEnumerator FinalDeathSequence()
     {
-        yield return new WaitForSeconds(2.5f);
+        Animator bossAnim = null;
+        if (bossGameObject != null) bossAnim = bossGameObject.GetComponentInChildren<Animator>();
 
-        if (dialogueController != null)
+        if (bossAnim != null)
         {
-            GameFlow.targetSpawnPoint = "ChurchExitSpawn";
-            dialogueController.SetSceneExit(sceneToLoadAfterBoss);
+            // OPZIONE 1: Rimettiamo il Bool originale che avevi nel tuo primissimo script (non si sa mai!)
+            bossAnim.SetBool("isDead", true);
+
+            // OPZIONE 2: L'OPZIONE NUCLEARE. 
+            // Forza la riproduzione ignorando le frecce dell'Animator.
+            // ATTENZIONE: Devi scrivere il nome ESATTO del quadratino grigio dell'animazione di morte!
+            // Se nell'Animator il quadratino si chiama "Wizard_Death", scrivi "Wizard_Death".
+            bossAnim.Play("anim_Death_Wizard");
         }
 
-        currentActiveDialogue = outroDialogue;
-        Talk(outroDialogue);
+        // 1. Aspettiamo che cada a terra
+        yield return new WaitForSeconds(2.5f);
+
+        // 2. Chiave ottenuta!
+        GameFlow.hasChurchKey = true;
+        Debug.Log("Chiave Ottenuta!");
+
+        // 3. Pausa drammatica
+        yield return new WaitForSeconds(2f);
+
+        // 4. Caricamento scena
+        GameFlow.targetSpawnPoint = "ChurchExitSpawn";
+        SceneManager.LoadScene(sceneToLoadAfterBoss);
     }
 
     public void Talk(DialogueText dialogueText)
@@ -103,6 +137,10 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
         if (dialogueController != null)
         {
             dialogueController.DisplayNextParagraph(dialogueText);
+        }
+        else
+        {
+            Debug.LogError("ERRORE FATALE: Non hai trascinato il DialogueController nel Manager!");
         }
     }
 }

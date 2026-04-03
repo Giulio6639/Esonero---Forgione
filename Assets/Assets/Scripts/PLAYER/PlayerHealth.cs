@@ -8,12 +8,10 @@ public class PlayerHealth : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
 
-    // --- NUOVA SEZIONE VITE E RESPAWN ---
     [Header("Sistema di Vite")]
     public int startingLives = 3;
     public int currentLives;
-    public Transform respawnPoint; // Il punto dove riapparirà il giocatore
-    // ------------------------------------
+    public Transform respawnPoint;
 
     [Header("UI Salute")]
     public Image healthBarFill;
@@ -42,7 +40,7 @@ public class PlayerHealth : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth;
-        currentLives = startingLives; // Inizializza le vite all'avvio del livello
+        currentLives = startingLives;
 
         animator = GetComponent<Animator>();
         playerController = GetComponent<HeroKnight>();
@@ -80,19 +78,11 @@ public class PlayerHealth : MonoBehaviour
     public void Heal(int healAmount)
     {
         if (currentHealth <= 0) return;
-
         currentHealth += healAmount;
-
-        if (currentHealth > maxHealth)
-        {
-            currentHealth = maxHealth;
-        }
-
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
         UpdateHealthUI();
-
         Debug.Log("Curato di " + healAmount + ". Vita attuale: " + currentHealth);
     }
-    // -----------------------------------------
 
     public void TakeDamage(int damageAmount, Transform attacker, bool isComboFinisher = false)
     {
@@ -111,32 +101,23 @@ public class PlayerHealth : MonoBehaviour
             }
             else
             {
-                Debug.Log("Parata Normale: Danno dimezzato, scudo su!");
                 damageAmount = Mathf.Max(1, damageAmount / 2);
-
                 currentHealth -= damageAmount;
                 UpdateHealthUI();
-
                 isInvincible = true;
                 iFramesTimer = iFramesDuration;
-
                 if (currentHealth <= 0) Die();
                 else StartCoroutine(ApplyBlockKnockback(attacker));
-
                 return;
             }
         }
 
         currentHealth -= damageAmount;
         UpdateHealthUI();
-
         isInvincible = true;
         iFramesTimer = iFramesDuration;
 
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        if (currentHealth <= 0) Die();
         else
         {
             animator.SetTrigger("Hurt");
@@ -149,9 +130,7 @@ public class PlayerHealth : MonoBehaviour
         playerController.isStunned = true;
         float direction = transform.position.x < attacker.position.x ? -1f : 1f;
         rb.linearVelocity = new Vector2(direction * knockbackForceX, knockbackForceY);
-
         yield return new WaitForSeconds(knockbackDuration);
-
         if (currentHealth > 0) playerController.isStunned = false;
     }
 
@@ -160,69 +139,33 @@ public class PlayerHealth : MonoBehaviour
         playerController.isStunned = true;
         float direction = transform.position.x < attacker.position.x ? -1f : 1f;
         rb.linearVelocity = new Vector2(direction * blockKnockbackX, blockKnockbackY);
-
         yield return new WaitForSeconds(blockKnockbackDuration);
-
         if (currentHealth > 0) playerController.isStunned = false;
     }
 
-    public bool IsAtMaxHealth()
-    {
-        return currentHealth >= maxHealth;
-    }
+    public bool IsAtMaxHealth() { return currentHealth >= maxHealth; }
 
     private void Die()
     {
         animator.SetTrigger("Death");
         playerController.isStunned = true;
         rb.linearVelocity = Vector2.zero;
-
         currentHealth = 0;
         UpdateHealthUI();
-
-        // SCALA UNA VITA
         currentLives--;
 
-        if (currentLives > 0)
-        {
-            Debug.Log("Sei morto! Vite rimaste: " + currentLives + ". Respawn in corso...");
-            StartCoroutine(RespawnRoutine());
-        }
-        else
-        {
-            Debug.Log("GAME OVER REALE! Hai esaurito le vite.");
-            // Qui in futuro puoi caricare la Scena di Game Over o ricaricare il livello da zero!
-        }
+        if (currentLives > 0) StartCoroutine(RespawnRoutine());
     }
 
-    // --- COROUTINE DI RESPAWN ---
     private IEnumerator RespawnRoutine()
     {
-        // Aspetta 2 secondi per far vedere l'animazione di morte al giocatore
         yield return new WaitForSeconds(2f);
-
-        // 1. Sposta il giocatore al punto di respawn
-        if (respawnPoint != null)
-        {
-            transform.position = respawnPoint.position;
-        }
-        else
-        {
-            Debug.LogWarning("Attenzione: Non hai assegnato nessun Respawn Point nell'Inspector!");
-        }
-
-        // 2. Ripristina la salute al massimo
+        if (respawnPoint != null) transform.position = respawnPoint.position;
         currentHealth = maxHealth;
         UpdateHealthUI();
-
-        // 3. Cancella il trigger di morte e forza l'animazione di Idle
         animator.ResetTrigger("Death");
-        animator.Play("Idle"); // NOTA: assicurati che lo stato base nell'Animator si chiami "Idle"
-
-        // 4. Sblocca il controller per fargli riprendere il controllo
+        animator.Play("Idle");
         playerController.isStunned = false;
-
-        // 5. Opzionale: Dagli 1-2 secondi di invincibilità post-respawn
         isInvincible = true;
         iFramesTimer = 2f;
     }

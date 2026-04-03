@@ -7,6 +7,9 @@ public class EnemyHealth : MonoBehaviour
     public int maxHealth = 60; // RICORDA: nell'Inspector per il fungo, alza questo valore a 150 o 200!
     public int currentHealth;
 
+    [Header("Impostazioni Boss")]
+    public bool isBoss = false; // NUOVO: Spunta questa casella nell'Inspector per il Mago!
+
     [Header("Danno da Contatto")]
     public bool dealsContactDamage = true;
     public int contactDamage = 10;
@@ -65,8 +68,20 @@ public class EnemyHealth : MonoBehaviour
         if (goblinAI != null) goblinAI.InterruptCombo();
 
         WizardAI wizardAI = GetComponent<WizardAI>();
-        if (wizardAI != null) wizardAI.InterruptCombo();
-
+        if (wizardAI != null)
+        {
+            // Se ha la super armor, non interrompere l'attacco, fallo solo lampeggiare
+            if (wizardAI.hasSuperArmor)
+            {
+                ignoreStun = true;
+                wizardAI.PlayFlashEffect();
+            }
+            else
+            {
+                // Se non sta attaccando, interrompi quello che stava facendo (es. camminare)
+                wizardAI.InterruptCombo();
+            }
+        }
         if (currentHealth <= 0)
         {
             Die();
@@ -110,7 +125,20 @@ public class EnemyHealth : MonoBehaviour
 
     private void Die()
     {
-        if (animator != null) animator.SetBool("isDead", true);
+        // --- LA MODIFICA CHIAVE ---
+        if (animator != null)
+        {
+            if (isBoss)
+            {
+                // Se è il boss, subisce il colpo e aspetta il dialogo
+                animator.SetTrigger("Hurt");
+            }
+            else
+            {
+                // Se è un nemico normale, muore subito
+                animator.SetBool("isDead", true);
+            }
+        }
 
         // Spegni tutte le IA possibili
         GoblinAI goblin = GetComponent<GoblinAI>();
@@ -141,18 +169,9 @@ public class EnemyHealth : MonoBehaviour
             col.enabled = false;
         }
 
-        // --- IL BIVIO DEL BOSS ---
-        // Controlla se questo nemico è il Boss (ha lo script BossDefeated attaccato)
-        BossDefeated bossScript = GetComponent<BossDefeated>();
-        if (bossScript != null)
+        // Se NON è un boss, sparisce dopo 2.5 secondi. Il boss invece rimane lì finché non lo decide il Manager!
+        if (!isBoss)
         {
-            // Se è il boss, avvia il caricamento della scena. 
-            // NON chiamiamo DisappearRoutine perché distruggerebbe il GameObject bloccando il caricamento!
-            bossScript.TriggerBossDeath();
-        }
-        else
-        {
-            // Se è un nemico normale, fallo sparire normalmente
             StartCoroutine(DisappearRoutine());
         }
     }

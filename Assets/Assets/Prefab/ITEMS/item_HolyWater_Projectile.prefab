@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 3943548117375216145}
   - component: {fileID: 4941184530963955128}
   - component: {fileID: 2737206856331754094}
-  - component: {fileID: 8989511858569880693}
+  - component: {fileID: 3718719358807320211}
   m_Layer: 0
-  m_Name: item_HolyWater
+  m_Name: item_HolyWater_Projectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -65,7 +65,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -108,7 +108,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &8989511858569880693
+--- !u!114 &3718719358807320211
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -117,17 +117,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6195953615161013681}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e910cd88e8f521e4e9c6692e8dcfbac6, type: 3}
+  m_Script: {fileID: 11500000, guid: 06e0eb18286f7aa4fbb2e3dc6dfd689c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemName: Holy Water
-  itemQuantity: 1
-  sprite: {fileID: 21300000, guid: f56f812c8c2e0514b8a1113b595afb22, type: 3}
-  itemDescription: 'Potente Acqua benedetta.
-
-
-    Lanciala per infliggere danni
-    ai nemici.'
+  throwForceX: 5
+  throwForceY: 4
+  firePrefab: {fileID: 3289193500794922701, guid: e81f56a3062fbd84ba570186a2007045, type: 3}
 --- !u!1 &7718140083989018884
 GameObject:
   m_ObjectHideFlags: 0

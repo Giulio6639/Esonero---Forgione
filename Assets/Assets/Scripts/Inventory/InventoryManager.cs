@@ -7,10 +7,7 @@ public class InventoryManager : MonoBehaviour
     public ItemSlot[] itemSlot;
     public ItemSO[] itemSOs;
 
-    void Start()
-    {
-        
-    }
+    void Start() { }
 
     void Update()
     {
@@ -18,17 +15,16 @@ public class InventoryManager : MonoBehaviour
         {
             InventoryMenu.SetActive(false);
             menuActivated = false;
-
             Time.timeScale = 1f;
         }
         else if (Input.GetKeyDown("q") && !menuActivated)
         {
             InventoryMenu.SetActive(true);
             menuActivated = true;
-
             Time.timeScale = 0f;
         }
     }
+
     public bool UseItem(string itemName)
     {
         for (int i = 0; i < itemSOs.Length; i++)
@@ -41,6 +37,7 @@ public class InventoryManager : MonoBehaviour
         }
         return false;
     }
+
     public int AddItem(string itemName, int quantity, Sprite itemSprite, string itemDescription)
     {
         for (int i = 0; i < itemSlot.Length; i++)
@@ -70,5 +67,4 @@ public class InventoryManager : MonoBehaviour
             itemSlot[i].thisItemSelected = false;
         }
     }
-
 }

@@ -41,12 +41,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1209145240271291540}
   - component: {fileID: 3554232927925011669}
-  - component: {fileID: 6981859684473223624}
-  - component: {fileID: 1494774327963188794}
+  - component: {fileID: 961194652051280535}
   - component: {fileID: 442761365440221526}
+  - component: {fileID: 1494774327963188794}
+  - component: {fileID: 6981859684473223624}
   - component: {fileID: 2404158322562813787}
   - component: {fileID: 5797060889803392944}
-  - component: {fileID: 961194652051280535}
   m_Layer: 7
   m_Name: HeroKnightz
   m_TagString: Player
@@ -105,40 +105,50 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 264
   stairsLayerName: Stairs
-  dropThroughTime: 0.6
-  wallCheckDistance: 0.4
-  wallCheckHeight: 0.5
+  dropThroughTime: 2
   enemyLayerName: Enemy
   rollIFrames: 0.3
   rollCooldown: 0.8
   parryWindow: 0.25
-  wallJumpForceX: 5
-  wallJumpForceY: 6.5
-  wallJumpInputFreeze: 0.2
   isStunned: 0
   m_grounded: 0
---- !u!95 &6981859684473223624
-Animator:
-  serializedVersion: 7
+--- !u!114 &961194652051280535
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2828473212976238109}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 3c2a5b7097b0fe44394328c0bdb9252e, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b376008f14faa640b3c13f306da8179, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  startingLives: 3
+  currentLives: 0
+  respawnPoint: {fileID: 0}
+  healthBarFill: {fileID: 0}
+  iFramesDuration: 0.35
+  knockbackForceX: 3
+  knockbackForceY: 1
+  knockbackDuration: 0.25
+  blockKnockbackX: 2
+  blockKnockbackY: 0
+  blockKnockbackDuration: 0.1
+--- !u!114 &442761365440221526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2828473212976238109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8392de0756f1bc243989f300fc5cb402, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!212 &1494774327963188794
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -182,7 +192,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 56724757
   m_SortingLayer: 3
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: ae297123f091bbf4e8f1835eb98fb293, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -194,18 +204,28 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &442761365440221526
-MonoBehaviour:
+--- !u!95 &6981859684473223624
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2828473212976238109}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8392de0756f1bc243989f300fc5cb402, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3c2a5b7097b0fe44394328c0bdb9252e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!50 &2404158322562813787
 Rigidbody2D:
   serializedVersion: 5
@@ -279,31 +299,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5596975, y: 1.2}
   m_EdgeRadius: 0
---- !u!114 &961194652051280535
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2828473212976238109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b376008f14faa640b3c13f306da8179, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 100
-  currentHealth: 0
-  startingLives: 3
-  currentLives: 0
-  respawnPoint: {fileID: 0}
-  healthBarFill: {fileID: 0}
-  iFramesDuration: 0.35
-  knockbackForceX: 3
-  knockbackForceY: 1
-  knockbackDuration: 0.25
-  blockKnockbackX: 2
-  blockKnockbackY: 0
-  blockKnockbackDuration: 0.1
 --- !u!1 &5120467939700945490
 GameObject:
   m_ObjectHideFlags: 0
