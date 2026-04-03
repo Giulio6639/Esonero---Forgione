@@ -1,4 +1,6 @@
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour
 {
@@ -7,7 +9,18 @@ public class InventoryManager : MonoBehaviour
     public ItemSlot[] itemSlot;
     public ItemSO[] itemSOs;
 
-    void Start() { }
+    [Header("UI Oggetto Equipaggiato")]
+    public Image equippedIcon;
+    public TMP_Text equippedAmountText;
+    public Sprite emptyEquippedSprite;
+
+    private string currentEquippedItemName = "";
+    private Sprite currentEquippedSprite;
+
+    void Start()
+    {
+        UpdateEquippedUI();
+    }
 
     void Update()
     {
@@ -23,6 +36,76 @@ public class InventoryManager : MonoBehaviour
             menuActivated = true;
             Time.timeScale = 0f;
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            UseEquippedItem();
+        }
+    }
+
+
+    public void EquipItem(string itemName, Sprite itemSprite)
+    {
+        currentEquippedItemName = itemName;
+        currentEquippedSprite = itemSprite;
+        UpdateEquippedUI();
+    }
+
+    public void UpdateEquippedUI()
+    {
+        if (string.IsNullOrEmpty(currentEquippedItemName))
+        {
+            equippedIcon.sprite = emptyEquippedSprite;
+            equippedAmountText.text = "";
+            return;
+        }
+
+        int totalQuantity = 0;
+        for (int i = 0; i < itemSlot.Length; i++)
+        {
+            if (itemSlot[i].itemName == currentEquippedItemName)
+            {
+                totalQuantity += itemSlot[i].quantity;
+            }
+        }
+
+        equippedIcon.sprite = currentEquippedSprite;
+        equippedAmountText.text = totalQuantity.ToString();
+
+        if (totalQuantity > 0)
+        {
+            equippedAmountText.color = Color.white;
+        }
+        else
+        {
+            equippedAmountText.color = Color.red;
+        }
+    }
+
+    private void UseEquippedItem()
+    {
+        if (string.IsNullOrEmpty(currentEquippedItemName)) return;
+
+        ItemSlot slotToUse = null;
+        for (int i = 0; i < itemSlot.Length; i++)
+        {
+            if (itemSlot[i].itemName == currentEquippedItemName && itemSlot[i].quantity > 0)
+            {
+                slotToUse = itemSlot[i];
+                break;
+            }
+        }
+
+        if (slotToUse != null)
+        {
+            bool usable = UseItem(currentEquippedItemName);
+
+            if (usable)
+            {
+                slotToUse.ConsumeOne();
+                UpdateEquippedUI();
+            }
+        }
     }
 
     public bool UseItem(string itemName)
@@ -31,8 +114,7 @@ public class InventoryManager : MonoBehaviour
         {
             if (itemSOs[i].itemName == itemName)
             {
-                bool usable = itemSOs[i].UseItem();
-                return usable;
+                return itemSOs[i].UseItem();
             }
         }
         return false;
@@ -40,23 +122,50 @@ public class InventoryManager : MonoBehaviour
 
     public int AddItem(string itemName, int quantity, Sprite itemSprite, string itemDescription)
     {
+        int leftOverItems = quantity;
+
         for (int i = 0; i < itemSlot.Length; i++)
         {
             if (itemSlot[i].itemName == itemName)
             {
-                int leftOverItems = itemSlot[i].AddItem(itemName, quantity, itemSprite, itemDescription);
-                return leftOverItems;
+                leftOverItems = itemSlot[i].AddItem(itemName, leftOverItems, itemSprite, itemDescription);
+
+                if (string.IsNullOrEmpty(currentEquippedItemName))
+                {
+                    EquipItem(itemName, itemSprite);
+                }
+                else
+                {
+                    UpdateEquippedUI();
+                }
+
+                if (leftOverItems == 0) return 0;
             }
         }
-        for (int i = 0; i < itemSlot.Length; i++)
+
+        if (leftOverItems > 0)
         {
-            if (itemSlot[i].quantity == 0)
+            for (int i = 0; i < itemSlot.Length; i++)
             {
-                int leftOverItems = itemSlot[i].AddItem(itemName, quantity, itemSprite, itemDescription);
-                return leftOverItems;
+                if (itemSlot[i].itemName == "")
+                {
+                    leftOverItems = itemSlot[i].AddItem(itemName, leftOverItems, itemSprite, itemDescription);
+
+                    if (string.IsNullOrEmpty(currentEquippedItemName))
+                    {
+                        EquipItem(itemName, itemSprite);
+                    }
+                    else
+                    {
+                        UpdateEquippedUI();
+                    }
+
+                    if (leftOverItems == 0) return 0;
+                }
             }
         }
-        return quantity;
+
+        return leftOverItems;
     }
 
     public void DeselectAllSlots()

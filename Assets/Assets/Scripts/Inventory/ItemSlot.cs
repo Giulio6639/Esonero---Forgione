@@ -2,7 +2,6 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using System;
 
 public class ItemSlot : MonoBehaviour, IPointerClickHandler
 {
@@ -14,7 +13,7 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     public string itemDescription;
     public Sprite emptySprite;
     [SerializeField]
-    public int maxNumberOfItems; 
+    public int maxNumberOfItems;
 
     // ========ITEM SLOT=========
     [SerializeField]
@@ -24,7 +23,6 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     public Image ItemDescriptionImage;
     public TMP_Text ItemDescriptionNameText;
     public TMP_Text ItemDescriptionText;
-
 
     [SerializeField]
     private Image itemImage;
@@ -36,16 +34,12 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
 
     private void Start()
     {
-        inventoryManager = GameObject.Find("Canvas").GetComponent<InventoryManager>();
+        inventoryManager = Object.FindFirstObjectByType<InventoryManager>();
     }
 
     public int AddItem(string newItemName, int newQuantity, Sprite newItemSprite, string newItemDescription)
     {
-        // Se lo slot è già completamente pieno, rifiutiamo in blocco la quantità in arrivo
-        if (isFull)
-        {
-            return newQuantity;
-        }
+        if (isFull) return newQuantity;
 
         this.itemName = newItemName;
         this.itemSprite = newItemSprite;
@@ -54,23 +48,24 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
 
         this.quantity += newQuantity;
 
+        if (this.quantity > 0)
+        {
+            quantityText.color = Color.white;
+        }
+
         if (this.quantity >= maxNumberOfItems)
         {
             int extraItems = this.quantity - maxNumberOfItems;
-
             this.quantity = maxNumberOfItems;
-
             quantityText.text = this.quantity.ToString();
             quantityText.enabled = true;
             isFull = true;
-
             return extraItems;
         }
 
         quantityText.text = this.quantity.ToString();
         quantityText.enabled = true;
-        isFull = false; 
-
+        isFull = false;
         return 0;
     }
 
@@ -80,7 +75,6 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
         {
             OnLeftClick();
         }
-
         if (eventData.button == PointerEventData.InputButton.Right)
         {
             OnRightClick();
@@ -89,37 +83,40 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
 
     public void OnLeftClick()
     {
-        if (thisItemSelected && quantity > 0)
-        {
-            bool usable = inventoryManager.UseItem(itemName);
-
-            if (usable)
-            {
-                quantity--;
-                quantityText.text = quantity.ToString();
-
-                if (quantity <= 0)
-                {
-                    EmptySlot();
-                }
-            }
-        }
-
         inventoryManager.DeselectAllSlots();
         selectedShader.SetActive(true);
         thisItemSelected = true;
 
-        if (quantity > 0)
+        if (itemName != "")
         {
             ItemDescriptionNameText.text = itemName;
             ItemDescriptionText.text = itemDescription;
             ItemDescriptionImage.sprite = itemSprite;
+
+            inventoryManager.EquipItem(itemName, itemSprite);
         }
         else
         {
             ItemDescriptionNameText.text = "";
             ItemDescriptionText.text = "";
             ItemDescriptionImage.sprite = emptySprite;
+        }
+    }
+
+    public void ConsumeOne()
+    {
+        quantity--;
+
+        if (quantity <= 0)
+        {
+            quantity = 0; 
+            quantityText.text = quantity.ToString();
+
+            quantityText.color = Color.red;
+        }
+        else
+        {
+            quantityText.text = quantity.ToString();
         }
     }
 
@@ -135,9 +132,5 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
         itemImage.sprite = emptySprite;
     }
 
-    public void OnRightClick()
-    {
-        
-    }
-
+    public void OnRightClick() { }
 }
