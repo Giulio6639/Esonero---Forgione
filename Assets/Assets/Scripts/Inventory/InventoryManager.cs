@@ -122,8 +122,42 @@ public class InventoryManager : MonoBehaviour
 
     public int AddItem(string itemName, int quantity, Sprite itemSprite, string itemDescription)
     {
-        int leftOverItems = quantity;
+        // Variabile per la quantità effettiva che andremo ad aggiungere
+        int actualQuantityToAdd = quantity;
 
+        // --- NUOVO: Logica del CAP Globale per le Red Potion ---
+        if (itemName == "Red Potion")
+        {
+            int currentTotal = 0;
+
+            // 1. Contiamo quante Red Potion abbiamo già in tutto l'inventario
+            for (int i = 0; i < itemSlot.Length; i++)
+            {
+                if (itemSlot[i].itemName == itemName)
+                {
+                    currentTotal += itemSlot[i].quantity;
+                }
+            }
+
+            // 2. Calcoliamo quanto spazio rimane per arrivare al massimo di 3
+            int maxCap = 3;
+            int spaceLeft = maxCap - currentTotal;
+
+            // Se siamo già a 3 o più, restituiamo 0 (l'oggetto a terra/fontana scompare ma non aggiungiamo nulla)
+            if (spaceLeft <= 0)
+            {
+                Debug.Log("Hai già il massimo di Red Potion (3).");
+                return 0;
+            }
+
+            // 3. Limitiamo la quantità: se ne raccogliamo 3 ma ne manca solo 1, actualQuantityToAdd diventa 1
+            actualQuantityToAdd = Mathf.Min(quantity, spaceLeft);
+        }
+
+        // --- DA QUI IN POI USIAMO 'actualQuantityToAdd' INVECE DI 'quantity' ---
+        int leftOverItems = actualQuantityToAdd;
+
+        // Cerca negli slot che contengono già questo oggetto
         for (int i = 0; i < itemSlot.Length; i++)
         {
             if (itemSlot[i].itemName == itemName)
@@ -131,18 +165,15 @@ public class InventoryManager : MonoBehaviour
                 leftOverItems = itemSlot[i].AddItem(itemName, leftOverItems, itemSprite, itemDescription);
 
                 if (string.IsNullOrEmpty(currentEquippedItemName))
-                {
                     EquipItem(itemName, itemSprite);
-                }
                 else
-                {
                     UpdateEquippedUI();
-                }
 
                 if (leftOverItems == 0) return 0;
             }
         }
 
+        // Se avanza qualcosa, cerca slot vuoti
         if (leftOverItems > 0)
         {
             for (int i = 0; i < itemSlot.Length; i++)
@@ -152,18 +183,17 @@ public class InventoryManager : MonoBehaviour
                     leftOverItems = itemSlot[i].AddItem(itemName, leftOverItems, itemSprite, itemDescription);
 
                     if (string.IsNullOrEmpty(currentEquippedItemName))
-                    {
                         EquipItem(itemName, itemSprite);
-                    }
                     else
-                    {
                         UpdateEquippedUI();
-                    }
 
                     if (leftOverItems == 0) return 0;
                 }
             }
         }
+
+        // Se itemName era "Red Potion", restituiamo comunque 0 perché vogliamo che l'eccesso sparisca
+        if (itemName == "Red Potion") return 0;
 
         return leftOverItems;
     }

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c627cfaeaf5e6f48b2106a8a25b3c10, type: 3}
+  m_Name: Text 1-1a
+  m_EditorClassIdentifier: 
+  SpeakerName: CIttadino
+  paragraphs:
+  - "Ah! L'eroe \xE8 arrivato!"
+  - "Presto, riprendi ci\xF2 che ci \xE8 stato tolto..."
+  - "La citt\xE0 \xE8 stata invasa da quei mostri demoniaci... Noi tutti siamo troppo
+    spaventati per uscire."
+  - Fa' qualcosa!

@@ -74,11 +74,17 @@ public class DialogueController : MonoBehaviour
         // Time Stop
         Time.timeScale = 0f;
 
-        // Update the speaker name
-        NPCNameText.text = dialogueText.SpeakerName;
+        // Update the speaker name
+        NPCNameText.text = dialogueText.SpeakerName;
 
-        // Add dialogue Text to the queue
-        for (int i = 0; i < dialogueText.paragraphs.Length; i++)
+        // --- NUOVO: Puliamo la coda prima di inserire i nuovi testi ---
+        paragraphs.Clear();
+        conversationEnded = false;
+        isTyping = false;
+        isWaitingBeforeType = false;
+
+        // Add dialogue Text to the queue
+        for (int i = 0; i < dialogueText.paragraphs.Length; i++)
         {
             paragraphs.Enqueue(dialogueText.paragraphs[i]);
         }

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &632280219469442550
+--- !u!1 &5138561813209113954
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,9 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2089533288713499732}
-  - component: {fileID: 3900046954094628834}
-  - component: {fileID: 8800979187724418421}
+  - component: {fileID: 7586129762930557660}
+  - component: {fileID: 3620136725427691643}
+  - component: {fileID: 3937551004458017196}
   m_Layer: 0
   m_Name: EKey
   m_TagString: Untagged
@@ -18,28 +18,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2089533288713499732
+--- !u!4 &7586129762930557660
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 632280219469442550}
+  m_GameObject: {fileID: 5138561813209113954}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.011, y: 0.95, z: 0.01522037}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalPosition: {x: 0.0039749146, y: 3.209, z: -0.32070068}
+  m_LocalScale: {x: 0.099999994, y: 0.099999994, z: 0.099999994}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2175218983614781649}
+  m_Father: {fileID: 6899150424663214835}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &3900046954094628834
+--- !u!212 &3620136725427691643
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 632280219469442550}
+  m_GameObject: {fileID: 5138561813209113954}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -88,14 +88,14 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &8800979187724418421
+--- !u!95 &3937551004458017196
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 632280219469442550}
+  m_GameObject: {fileID: 5138561813209113954}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: ab572f79a83171c46823cad9b6b112c4, type: 2}
@@ -110,7 +110,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1 &6122888664047047750
+--- !u!1 &7583321038040371532
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -118,39 +118,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2175218983614781649}
-  - component: {fileID: 1807959692379825858}
-  - component: {fileID: 124317625816934350}
+  - component: {fileID: 6899150424663214835}
+  - component: {fileID: 704156737805874263}
+  - component: {fileID: 6174232583928402246}
   m_Layer: 0
-  m_Name: NPC
+  m_Name: Fountain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2175218983614781649
+--- !u!4 &6899150424663214835
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6122888664047047750}
+  m_GameObject: {fileID: 7583321038040371532}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.397, y: -2.4742346, z: -0.015220369}
+  m_LocalPosition: {x: 132.17, y: -6.06, z: 0.32070068}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2089533288713499732}
+  - {fileID: 7586129762930557660}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &1807959692379825858
+--- !u!61 &704156737805874263
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6122888664047047750}
+  m_GameObject: {fileID: 7583321038040371532}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -178,7 +178,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.6158347}
+  m_Offset: {x: 0.019073486, y: 0.8708662}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -188,28 +188,32 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 2.2316694}
+  m_Size: {x: 2.3094788, y: 3.199414}
   m_EdgeRadius: 0
---- !u!114 &124317625816934350
+--- !u!114 &6174232583928402246
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6122888664047047750}
+  m_GameObject: {fileID: 7583321038040371532}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cefc0a2f97b3e3e41a57ef4f0781faf1, type: 3}
+  m_Script: {fileID: 11500000, guid: 26152b218a04b5d41acc1a125a159b79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interactSprite: {fileID: 3900046954094628834}
+  _interactSprite: {fileID: 3620136725427691643}
   _visualRange: 4
-  firstDialogue: {fileID: 0}
-  secondDialogue: {fileID: 0}
-  givesItem: 0
-  itemName: 
-  itemQuantity: 0
-  itemSprite: {fileID: 0}
-  itemDescription: 
-  isLevelExit: 0
-  sceneToLoad: 
+  firstTimeDialogue: {fileID: 11400000, guid: 15dcb3d72947acf42afb3c598d66205a, type: 2}
+  repeatDialogue: {fileID: 11400000, guid: ab78c2ff04e4c1046a9a43c67a7d2775, type: 2}
+  itemName: Red Potion
+  itemQuantity: 3
+  itemSprite: {fileID: 21300000, guid: c01f7a293883d3a408c2a84b25f48f27, type: 3}
+  itemDescription: 'Una pozione offerta dal Dio della  magica fontana.
+
+
+    Bevila
+    per recuperare 50 HP!
+
+
+    ...Sembra comunque una normalissima fontana.'
