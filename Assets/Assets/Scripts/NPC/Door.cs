@@ -2,7 +2,13 @@ using UnityEngine;
 
 public class Door : NPC, ITalkable
 {
-    [Header("Dialoghi")]
+    [Header("Configurazione Chiave (Novità)")]
+    [Tooltip("Spunta se questa porta richiede la chiave della chiesa per aprirsi")]
+    [SerializeField] private bool requiresChurchKey = false;
+    [Tooltip("Il dialogo che appare se non hai la chiave (es. 'La porta è chiusa a chiave.')")]
+    [SerializeField] private DialogueText lockedDialogue;
+
+    [Header("Dialoghi (Se Aperta)")]
     [SerializeField] private DialogueText firstDialogue;
     [Tooltip("Se lasciato vuoto, ripeterà sempre il primo dialogo")]
     [SerializeField] private DialogueText secondDialogue;
@@ -23,15 +29,26 @@ public class Door : NPC, ITalkable
     private bool hasFinishedFirstDialogue = false;
 
     private void Awake()
-    {
-        // Aggiungiamo "FindObjectsInactive.Include" per dirgli di cercare anche se l'oggetto è spento!
+    { 
         dialogueController = Object.FindFirstObjectByType<DialogueController>(FindObjectsInactive.Include);
-
         inventoryManager = Object.FindFirstObjectByType<InventoryManager>(FindObjectsInactive.Include);
     }
 
     public override void Interact()
     {
+        if (requiresChurchKey && !GameFlow.hasChurchKey)
+        {
+            if (lockedDialogue != null)
+            {
+                Talk(lockedDialogue);
+            }
+            else
+            {
+                Debug.LogWarning("La porta è chiusa, ma non hai assegnato il DialogueText 'lockedDialogue' nell'Inspector!");
+            }
+            return;
+        }
+
         DialogueText currentDialogue = firstDialogue;
         if (hasFinishedFirstDialogue && secondDialogue != null)
         {
@@ -45,7 +62,7 @@ public class Door : NPC, ITalkable
             if (givesItem && inventoryManager != null)
             {
                 inventoryManager.AddItem(itemName, itemQuantity, itemSprite, itemDescription);
-                givesItem = false; 
+                givesItem = false;
             }
 
             hasFinishedFirstDialogue = true;

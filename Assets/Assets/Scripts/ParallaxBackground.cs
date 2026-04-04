@@ -1,28 +1,45 @@
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class ParallaxBackground : MonoBehaviour
 {
-    [Header("Impostazioni Parallasse")]
-    [Tooltip("0 = Fermo (Cielo), 1 = Si muove col giocatore (Primo piano)")]
-    public float parallaxEffectMultiplier;
+    private float length, startpos;
+    public Transform cam; // La Main Camera
 
-    private Transform cameraTransform;
-    private Vector3 lastCameraPosition;
+    [Tooltip("0 = Fermo rispetto alla camera, 1 = Si muove con la camera (Sfondo lontanissimo)")]
+    public float parallaxFactor;
 
     void Start()
     {
-        cameraTransform = Camera.main.transform;
-        lastCameraPosition = cameraTransform.position;
+        startpos = transform.position.x;
+        // Ottiene automaticamente la larghezza del tuo sprite
+        length = GetComponent<SpriteRenderer>().bounds.size.x;
+
+        // Se non hai assegnato la camera nell'inspector, la trova da solo
+        if (cam == null) cam = Camera.main.transform;
     }
 
-    void LateUpdate()
+    void Update()
     {
-        // Calcola di quanto si è mossa la telecamera dall'ultimo frame
-        Vector3 deltaMovement = cameraTransform.position - lastCameraPosition;
+        // 'temp' calcola quanto ci siamo allontanati dal punto di origine rispetto al layer
+        float temp = (cam.transform.position.x * (1 - parallaxFactor));
 
-        // Sposta lo sfondo in base al moltiplicatore
-        transform.position += new Vector3(deltaMovement.x * parallaxEffectMultiplier, deltaMovement.y * parallaxEffectMultiplier, 0);
+        // 'dist' calcola di quanto deve spostarsi il layer
+        float dist = (cam.transform.position.x * parallaxFactor);
 
-        lastCameraPosition = cameraTransform.position;
+        // Applica il movimento al layer sull'asse X
+        transform.position = new Vector3(startpos + dist, transform.position.y, transform.position.z);
+
+        // --- LA MAGIA DELL'INFINITO ---
+        // Se la camera supera il bordo destro dell'immagine, sposta l'origine in avanti
+        if (temp > startpos + length)
+        {
+            startpos += length;
+        }
+        // Se la camera supera il bordo sinistro, sposta l'origine indietro
+        else if (temp < startpos - length)
+        {
+            startpos -= length;
+        }
     }
 }
