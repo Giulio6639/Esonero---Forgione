@@ -15,6 +15,8 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("UI Salute")]
     public Image healthBarFill;
+    public RectTransform healthBarContainer; // Il riquadro da allungare
+    public float pixelPerPuntoVita = 2f;     // Moltiplicatore: quanto è largo 1 HP?
 
     [Header("Impostazioni Invincibilità")]
     public float iFramesDuration = 1.5f;
@@ -47,6 +49,7 @@ public class PlayerHealth : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
 
+        AggiornaDimensioneBarra(); // <--- AGGIUNGI QUI
         UpdateHealthUI();
     }
 
@@ -125,6 +128,24 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    public void IncreaseMaxHealth(int amount)
+    {
+        maxHealth += amount;
+        currentHealth += amount;
+
+        AggiornaDimensioneBarra(); // <--- AGGIUNGI QUI
+        UpdateHealthUI();
+
+        Debug.Log("Vita massima aumentata! Nuova vita massima: " + maxHealth);
+    }
+    private void AggiornaDimensioneBarra()
+    {
+        if (healthBarContainer != null)
+        {
+            // Cambia solo la larghezza (X) in base alla maxHealth, lascia inalterata l'altezza (Y)
+            healthBarContainer.sizeDelta = new Vector2(maxHealth * pixelPerPuntoVita, healthBarContainer.sizeDelta.y);
+        }
+    }
     private IEnumerator ApplyKnockback(Transform attacker)
     {
         playerController.isStunned = true;

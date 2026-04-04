@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
@@ -18,6 +19,10 @@ public class EnemyHealth : MonoBehaviour
     public float knockbackForceX = 3f;
     public float knockbackForceY = 2f;
     public float knockbackDuration = 0.2f;
+
+    [Header("Drop Gemme")]
+    public List<GemDrop> tabellaDropGemme;
+    public float forzaEsplosioneGemme = 4f; // Per far schizzare le gemme in aria
 
     [Header("Morte e Particelle")]
     public float disappearDelay = 2.5f;
@@ -52,7 +57,6 @@ public class EnemyHealth : MonoBehaviour
 
         currentHealth -= damageAmount;
 
-        // --- CONTROLLO SUPER ARMOR DEL FUNGO ---
         bool ignoreStun = false;
         FungusAI fungusAI = GetComponent<FungusAI>();
         if (fungusAI != null)
@@ -61,16 +65,13 @@ public class EnemyHealth : MonoBehaviour
             if (fungusAI.hasSuperArmor) ignoreStun = true;
             fungusAI.PlayFlashEffect();
         }
-        // ----------------------------------------
 
-        // Interrompi le combo degli altri nemici
         GoblinAI goblinAI = GetComponent<GoblinAI>();
         if (goblinAI != null) goblinAI.InterruptCombo();
 
         WizardAI wizardAI = GetComponent<WizardAI>();
         if (wizardAI != null)
         {
-            // Se ha la super armor, non interrompere l'attacco, fallo solo lampeggiare
             if (wizardAI.hasSuperArmor)
             {
                 ignoreStun = true;
@@ -78,7 +79,6 @@ public class EnemyHealth : MonoBehaviour
             }
             else
             {
-                // Se non sta attaccando, interrompi quello che stava facendo (es. camminare)
                 wizardAI.InterruptCombo();
             }
         }
@@ -95,6 +95,20 @@ public class EnemyHealth : MonoBehaviour
 
             animator.SetTrigger("Hurt");
             StartCoroutine(HitReaction(attacker, applyKnockback));
+        }
+
+        SamuraiAI samuraiAI = GetComponent<SamuraiAI>();
+        if (samuraiAI != null)
+        {
+            if (samuraiAI.hasSuperArmor)
+            {
+                ignoreStun = true;
+                samuraiAI.PlayFlashEffect();
+            }
+            else
+            {
+                samuraiAI.InterruptCombo();
+            }
         }
     }
 
@@ -138,6 +152,8 @@ public class EnemyHealth : MonoBehaviour
                 // Se è un nemico normale, muore subito
                 animator.SetBool("isDead", true);
             }
+
+            DropGemme();
         }
 
         // Spegni tutte le IA possibili
@@ -154,6 +170,9 @@ public class EnemyHealth : MonoBehaviour
         if (wizard != null) wizard.enabled = false;
 
         if (aiScript != null) aiScript.enabled = false;
+
+        SamuraiAI samurai = GetComponent<SamuraiAI>();
+        if (samurai != null) samurai.enabled = false;
 
         // Blocca il corpo
         if (rb != null)
@@ -174,6 +193,7 @@ public class EnemyHealth : MonoBehaviour
         {
             StartCoroutine(DisappearRoutine());
         }
+
     }
 
     private IEnumerator DisappearRoutine()
@@ -186,6 +206,42 @@ public class EnemyHealth : MonoBehaviour
         }
 
         Destroy(gameObject);
+    }
+
+    [System.Serializable]
+    public class GemDrop
+    {
+        public GameObject gemmaPrefab;
+        public int quantitaMinima = 1;
+        public int quantitaMassima = 3;
+        [Range(0f, 100f)] public float probabilitaDrop = 100f; // Percentuale di drop
+    }
+
+    private void DropGemme()
+    {
+        foreach (GemDrop drop in tabellaDropGemme)
+        {
+            // Tiriamo il dado per vedere se questa gemma deve droppare
+            float randomChance = Random.Range(0f, 100f);
+            if (randomChance <= drop.probabilitaDrop)
+            {
+                // Scegliamo quante gemme di questo tipo droppare
+                int quantita = Random.Range(drop.quantitaMinima, drop.quantitaMassima + 1);
+
+                for (int i = 0; i < quantita; i++)
+                {
+                    GameObject gemma = Instantiate(drop.gemmaPrefab, transform.position, Quaternion.identity);
+
+                    // Se la gemma ha un Rigidbody2D, le diamo una spinta verso l'alto/lati per un bell'effetto "esplosione di monete"
+                    Rigidbody2D rbGemma = gemma.GetComponent<Rigidbody2D>();
+                    if (rbGemma != null)
+                    {
+                        Vector2 direzioneCasuale = new Vector2(Random.Range(-1f, 1f), Random.Range(0.8f, 1.5f)).normalized;
+                        rbGemma.AddForce(direzioneCasuale * forzaEsplosioneGemme, ForceMode2D.Impulse);
+                    }
+                }
+            }
+        }
     }
 
     private void OnDisable()

@@ -11,6 +11,8 @@ public class DialogueController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI NPCDialogueText;
     [SerializeField] private float typeSpeed = 10;
 
+    public static bool isDialogueActive = false;
+
     private Queue<string> paragraphs = new Queue<string>();
 
     private bool conversationEnded;
@@ -66,6 +68,8 @@ public class DialogueController : MonoBehaviour
 
     private void StartConversation(DialogueText dialogueText)
     {
+        isDialogueActive = true;
+
         if (!gameObject.activeSelf)
         {
             gameObject.SetActive(true);
@@ -91,6 +95,8 @@ public class DialogueController : MonoBehaviour
     }
     private void EndConversation()
     {
+        isDialogueActive = false;
+
         conversationEnded = false;
         Time.timeScale = 1f;
 

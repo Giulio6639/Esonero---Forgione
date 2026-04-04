@@ -36,22 +36,17 @@ public abstract class NPC : MonoBehaviour, IInteractable
             _interactSprite.gameObject.SetActive(isCloseEnoughForSprite);
         }
 
-        // --- IL TEST DELLA VERITÀ ---
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("1. Hai premuto E!");
-            Debug.Log("2. Sei dentro il collider (Trigger)? " + _isPlayerInRange);
+            if (InventoryManager.isInventoryOpen) return;
 
             if (_isPlayerInRange)
             {
                 HeroKnight playerScript = _playerTransform.GetComponent<HeroKnight>();
                 if (playerScript != null)
                 {
-                    Debug.Log("3. L'HeroKnight può interagire (Grounded, non in attacco)? " + playerScript.canInteract);
-
                     if (playerScript.canInteract || Time.timeScale == 0f)
                     {
-                        Debug.Log("4. INTERAZIONE PARTITA!");
                         Interact();
                     }
                 }

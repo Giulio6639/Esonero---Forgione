@@ -294,11 +294,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 120
   currentHealth: 0
+  isBoss: 0
   dealsContactDamage: 1
   contactDamage: 5
   knockbackForceX: 3
   knockbackForceY: 2
   knockbackDuration: 0.2
+  tabellaDropGemme:
+  - gemmaPrefab: {fileID: 8012520491899763757, guid: 0c5f477b6c1a24542b0f7d7844fac4f8, type: 3}
+    quantitaMinima: 1
+    quantitaMassima: 2
+    probabilitaDrop: 90
+  - gemmaPrefab: {fileID: 5952983220162818068, guid: bd18928237a4e7c4d8ae93f0596c3679, type: 3}
+    quantitaMinima: 1
+    quantitaMassima: 1
+    probabilitaDrop: 10
+  forzaEsplosioneGemme: 4
   disappearDelay: 2.5
   deathParticles: {fileID: 166889975601686192, guid: 50093039979299442a38bd39ba8c7727, type: 3}
   aiScript: {fileID: 3528974404596628206}

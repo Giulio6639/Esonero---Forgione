@@ -22,6 +22,7 @@ public class HeroKnight : MonoBehaviour
     public float attackActiveDuration = 0.15f;
 
     [Header("Sword Beam (Full Health)")]
+    public bool hasSwordBeamUnlocked = false;
     public GameObject swordBeamPrefab;
     public float beamSpeed = 10f;
     public Transform beamSpawnPoint;
@@ -266,7 +267,7 @@ public class HeroKnight : MonoBehaviour
 
             m_animator.SetTrigger("Attack" + m_currentAttack);
 
-            if (m_currentAttack == 1 && swordBeamPrefab != null && playerHealth != null && playerHealth.IsAtMaxHealth())
+            if (m_currentAttack == 1 && swordBeamPrefab != null && playerHealth != null && playerHealth.IsAtMaxHealth() && hasSwordBeamUnlocked)
             {
                 StartCoroutine(ShootSwordBeamRoutine());
             }

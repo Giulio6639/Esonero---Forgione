@@ -17,6 +17,7 @@ public class InventoryManager : MonoBehaviour
     private string currentEquippedItemName = "";
     private Sprite currentEquippedSprite;
 
+    public static bool isInventoryOpen = false;
     void Start()
     {
         UpdateEquippedUI();
@@ -24,17 +25,32 @@ public class InventoryManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown("q") && menuActivated)
+        // Intercettiamo il tasto Q come primissima cosa
+        if (Input.GetKeyDown("q"))
         {
-            InventoryMenu.SetActive(false);
-            menuActivated = false;
-            Time.timeScale = 1f;
-        }
-        else if (Input.GetKeyDown("q") && !menuActivated)
-        {
-            InventoryMenu.SetActive(true);
-            menuActivated = true;
-            Time.timeScale = 0f;
+            // Controlliamo cosa c'è a schermo
+            bool isShopOpen = ShopManager.Instance != null && ShopManager.Instance.shopPanel.activeSelf;
+            bool isDialogueOpen = DialogueController.isDialogueActive;
+
+            if (isShopOpen || isDialogueOpen)
+            {
+                return;
+            }
+
+            if (menuActivated)
+            {
+                InventoryMenu.SetActive(false);
+                menuActivated = false;
+                isInventoryOpen = false;
+                Time.timeScale = 1f;
+            }
+            else
+            {
+                InventoryMenu.SetActive(true);
+                menuActivated = true;
+                isInventoryOpen = true;
+                Time.timeScale = 0f; 
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -42,7 +58,6 @@ public class InventoryManager : MonoBehaviour
             UseEquippedItem();
         }
     }
-
 
     public void EquipItem(string itemName, Sprite itemSprite)
     {
