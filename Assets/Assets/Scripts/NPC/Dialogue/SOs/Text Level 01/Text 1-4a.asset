@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c627cfaeaf5e6f48b2106a8a25b3c10, type: 3}
   m_Name: Text 1-4a
   m_EditorClassIdentifier: 
-  SpeakerName: Cittadino
+  SpeakerName: Cittadino strano
   paragraphs:
-  - 
+  - "Pi\xF9 avanti c'\xE8 l'entrata per la citt\xE0."
+  - Prima ho sentito qualche mostro parlare, qui davanti alla porta...
+  - '...dicevano cose strane, del tipo: "SSSSScale..... SSSS..."'
+  - 'e altre cose come: "SSSS... SSSScendere..."'
+  - Ma cosa c'hanno con questa "S"??
+  - "Mah, forse sar\xF2 pazzo io."
