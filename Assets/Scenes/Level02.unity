@@ -48422,7 +48422,7 @@ PrefabInstance:
     - target: {fileID: 124317625816934350, guid: fb42044f7e5d8ea478eedcdcccb63b13, type: 3}
       propertyPath: firstDialogue
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 11400000, guid: eea13f7101be1c24293a6635e567a1a2, type: 2}
     - target: {fileID: 124317625816934350, guid: fb42044f7e5d8ea478eedcdcccb63b13, type: 3}
       propertyPath: secondDialogue
       value: 
