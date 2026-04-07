@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c627cfaeaf5e6f48b2106a8a25b3c10, type: 3}
   m_Name: Text 2-3
   m_EditorClassIdentifier: 
-  SpeakerName: Cittadino
+  SpeakerName: Piantone
   paragraphs:
-  - "Mh, ho sentito che non sar\xE0 semplice aprire il portone per la Torre."
-  - Ma sono sicuro che ci riuscirai. Buona fortuna!
+  - Cerchi la chiave per la torre?
+  - "Me l'ha rubata un vecchio stregone... Poi si \xE8 rinchiuso nella chiesa."
+  - "Per entrarci, dovrai guardare un po' pi\xF9... in \"alto\"."

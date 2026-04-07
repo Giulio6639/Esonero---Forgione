@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: fc436fb29cf2b5e4d97c8b709a0cdab7
+guid: 4e179cfa924e5774992a9f3be5d92a2a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3799458613590238157
-    second: LeftArrowButton_7x10_0
+      213: 3356501270804388586
+    second: slider 1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -84,19 +84,6 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: Standalone
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
     buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -111,6 +98,19 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -178,12 +178,12 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: LeftArrowButton_7x10_0
+      name: slider 1_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 7
+        x: 6
+        y: 4
+        width: 52
         height: 10
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -193,8 +193,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: dc328d98a736ab430800000000000000
-      internalID: 3799458613590238157
+      spriteID: aea517e4f10b49e20800000000000000
+      internalID: 3356501270804388586
       vertices: []
       indices: 
       edges: []
@@ -213,7 +213,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      LeftArrowButton_7x10_0: 3799458613590238157
+      slider 1_0: 3356501270804388586
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c627cfaeaf5e6f48b2106a8a25b3c10, type: 3}
-  m_Name: Text 2-2
+  m_Name: Text 2-1b
   m_EditorClassIdentifier: 
-  SpeakerName: Cittadino
+  SpeakerName: Cittadino spaventato
   paragraphs:
-  - "Ho sentito che la porta per la torre \xE8 stata chiusa."
+  - "Recati alla Torre. L\xEC risiede Zephyrus, colui che ha portato tutto alla rovina."

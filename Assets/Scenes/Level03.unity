@@ -7029,6 +7029,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 4326224195812885887, guid: bc2a3717d1b8183459716254e5705ac7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4382595255213658982, guid: bc2a3717d1b8183459716254e5705ac7, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -7240,11 +7244,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7763432194926741617, guid: e4f9009690476e54989649868dcf8d67, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6.28
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7763432194926741617, guid: e4f9009690476e54989649868dcf8d67, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 55.87
+      value: 45.79
       objectReference: {fileID: 0}
     - target: {fileID: 7763432194926741617, guid: e4f9009690476e54989649868dcf8d67, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9805,7 +9809,7 @@ Camera:
   far clip plane: 1000
   field of view: 4
   orthographic: 1
-  orthographic size: 5.3999996
+  orthographic size: 1.9
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
