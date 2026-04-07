@@ -5,6 +5,12 @@ using UnityEngine.EventSystems;
 
 public class ItemSlot : MonoBehaviour, IPointerClickHandler
 {
+    // --- NUOVA VARIABILE ---
+    [Header("Restrizioni Slot")]
+    [Tooltip("Scrivi il nome esatto dell'oggetto. Lascia vuoto per accettare qualsiasi cosa.")]
+    public string allowedItemName = "";
+    // -----------------------
+
     // ========ITEM DATA=========
     public string itemName;
     public int quantity;
@@ -109,7 +115,7 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
 
         if (quantity <= 0)
         {
-            quantity = 0; 
+            quantity = 0;
             quantityText.text = quantity.ToString();
 
             quantityText.color = Color.red;

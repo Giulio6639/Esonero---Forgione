@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interactSprite: {fileID: 8926737112416467413}
-  _visualRange: 4
+  _visualRange: 2
 --- !u!1 &4755214179493910875
 GameObject:
   m_ObjectHideFlags: 0

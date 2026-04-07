@@ -1024,7 +1024,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8303960371636194063
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2291,7 +2291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34672cfb1b3b7fa4992bbfd99008e746, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gemmeTotali: 1000
+  gemmeTotali: 0
   testoGemmeUI: {fileID: 4853858702758712028}
 --- !u!114 &3520416384345107905
 MonoBehaviour:
@@ -5645,6 +5645,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1540041723531525952}
     m_Modifications:
     - target: {fileID: 1204255044982211434, guid: c1b3548a468512442bce826b1d77523e, type: 3}
+      propertyPath: allowedItemName
+      value: Yellow Potion
+      objectReference: {fileID: 0}
+    - target: {fileID: 1204255044982211434, guid: c1b3548a468512442bce826b1d77523e, type: 3}
       propertyPath: maxNumberOfItems
       value: 2
       objectReference: {fileID: 0}
@@ -5798,6 +5802,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1540041723531525952}
     m_Modifications:
     - target: {fileID: 1204255044982211434, guid: c1b3548a468512442bce826b1d77523e, type: 3}
+      propertyPath: allowedItemName
+      value: Red Potion
+      objectReference: {fileID: 0}
+    - target: {fileID: 1204255044982211434, guid: c1b3548a468512442bce826b1d77523e, type: 3}
       propertyPath: ItemDescriptionText
       value: 
       objectReference: {fileID: 657119929388839213}
@@ -5926,6 +5934,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1540041723531525952}
     m_Modifications:
+    - target: {fileID: 1204255044982211434, guid: c1b3548a468512442bce826b1d77523e, type: 3}
+      propertyPath: allowedItemName
+      value: Holy Water
+      objectReference: {fileID: 0}
     - target: {fileID: 1204255044982211434, guid: c1b3548a468512442bce826b1d77523e, type: 3}
       propertyPath: maxNumberOfItems
       value: 20
