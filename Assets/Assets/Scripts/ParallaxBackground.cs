@@ -19,7 +19,7 @@ public class ParallaxBackground : MonoBehaviour
         if (cam == null) cam = Camera.main.transform;
     }
 
-    void Update()
+    void LateUpdate()
     {
         // 'temp' calcola quanto ci siamo allontanati dal punto di origine rispetto al layer
         float temp = (cam.transform.position.x * (1 - parallaxFactor));

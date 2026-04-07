@@ -31245,7 +31245,6 @@ GameObject:
   m_Component:
   - component: {fileID: 767267226}
   - component: {fileID: 767267228}
-  - component: {fileID: 767267227}
   - component: {fileID: 767267229}
   m_Layer: 0
   m_Name: Layer-3
@@ -31269,18 +31268,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1556937979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &767267227
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 767267225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94187a67eb3eace42aa6e4baab626346, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!212 &767267228
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -31508,6 +31495,11 @@ PrefabInstance:
       propertyPath: _interactSprite
       value: 
       objectReference: {fileID: 949430500}
+    - target: {fileID: 124317625816934350, guid: fb42044f7e5d8ea478eedcdcccb63b13, type: 3}
+      propertyPath: itemDescription
+      value: "Una pozione dorata.\n\nBevila e diventerai pi\xF9 forte e veloce per
+        30 secondi.\n\nEssenziale per situazioni complesse."
+      objectReference: {fileID: 0}
     - target: {fileID: 2175218983614781649, guid: fb42044f7e5d8ea478eedcdcccb63b13, type: 3}
       propertyPath: m_LocalPosition.x
       value: -16.21
@@ -32026,7 +32018,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1335652117}
   - component: {fileID: 1335652119}
-  - component: {fileID: 1335652118}
   - component: {fileID: 1335652120}
   m_Layer: 0
   m_Name: Layer-0
@@ -32050,18 +32041,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1556937979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1335652118
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1335652116}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94187a67eb3eace42aa6e4baab626346, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!212 &1335652119
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -32178,7 +32157,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1349985848}
   - component: {fileID: 1349985850}
-  - component: {fileID: 1349985849}
   - component: {fileID: 1349985851}
   m_Layer: 0
   m_Name: Layer-5
@@ -32202,18 +32180,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1556937979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1349985849
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1349985847}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94187a67eb3eace42aa6e4baab626346, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!212 &1349985850
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -32257,7 +32223,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1464726227
   m_SortingLayer: 2
-  m_SortingOrder: -3
+  m_SortingOrder: -2
   m_Sprite: {fileID: 21300000, guid: 45367da5e1f745b4daacb977484a3704, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -32282,7 +32248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 121137232}
-  parallaxFactor: 0.3
+  parallaxFactor: 0.2
 --- !u!1 &1405409901
 GameObject:
   m_ObjectHideFlags: 0
@@ -32495,7 +32461,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1489516727}
   - component: {fileID: 1489516729}
-  - component: {fileID: 1489516728}
   - component: {fileID: 1489516730}
   m_Layer: 0
   m_Name: Layer-1
@@ -32519,18 +32484,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1556937979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1489516728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1489516726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94187a67eb3eace42aa6e4baab626346, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!212 &1489516729
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -32775,7 +32728,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1723744165}
   - component: {fileID: 1723744167}
-  - component: {fileID: 1723744166}
   - component: {fileID: 1723744168}
   m_Layer: 0
   m_Name: Layer-4
@@ -32799,18 +32751,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1556937979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1723744166
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1723744164}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94187a67eb3eace42aa6e4baab626346, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!212 &1723744167
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -32854,7 +32794,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1464726227
   m_SortingLayer: 2
-  m_SortingOrder: -2
+  m_SortingOrder: -3
   m_Sprite: {fileID: 21300000, guid: 066d770ac5ce1af4ca576794cfe6704e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
