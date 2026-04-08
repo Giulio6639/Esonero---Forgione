@@ -20,6 +20,15 @@ public class EnemyHealth : MonoBehaviour
     public float knockbackForceY = 2f;
     public float knockbackDuration = 0.2f;
 
+    [Header("Audio SFX (Nemici)")]
+    [Tooltip("L'AudioSource collegato a questo nemico (usato per i danni)")]
+    public AudioSource audioSource;
+    [Tooltip("Suono riprodotto ogni volta che il nemico prende danno (Hurt)")]
+    public AudioClip hurtSound;
+    [Tooltip("Suono riprodotto quando il nemico muore")]
+    public AudioClip deathSound;
+    [Range(0f, 1f)] public float soundVolume = 1f; // Volume generale per i suoni di questo nemico
+
     [Header("Drop Gemme")]
     public List<GemDrop> tabellaDropGemme;
     public float forzaEsplosioneGemme = 4f; // Per far schizzare le gemme in aria
@@ -38,6 +47,12 @@ public class EnemyHealth : MonoBehaviour
         currentHealth = maxHealth;
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
+
+        // Sicurezza: se hai dimenticato di collegare l'AudioSource nell'Inspector, lo cerca da solo
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -56,6 +71,16 @@ public class EnemyHealth : MonoBehaviour
         if (currentHealth <= 0) return;
 
         currentHealth -= damageAmount;
+
+        // --- SFX DANNO ---
+        // Suona l'effetto "Hurt" solo se non è un colpo letale (altrimenti suona la morte)
+        if (currentHealth > 0 && audioSource != null && hurtSound != null)
+        {
+            // Usiamo un leggero cambio di pitch randomico per variare il suono dei colpi ripetuti
+            audioSource.pitch = Random.Range(0.9f, 1.1f);
+            audioSource.PlayOneShot(hurtSound, soundVolume);
+        }
+        // -----------------
 
         bool ignoreStun = false;
         FungusAI fungusAI = GetComponent<FungusAI>();
@@ -139,6 +164,14 @@ public class EnemyHealth : MonoBehaviour
 
     private void Die()
     {
+        // --- SFX MORTE ---
+        if (deathSound != null)
+        {
+            // Usiamo PlayClipAtPoint così il suono finisce anche se il nemico scompare subito
+            AudioSource.PlayClipAtPoint(deathSound, transform.position, soundVolume);
+        }
+        // -----------------
+
         // --- LA MODIFICA CHIAVE ---
         if (animator != null)
         {

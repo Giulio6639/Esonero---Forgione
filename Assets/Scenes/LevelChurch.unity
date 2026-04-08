@@ -198,6 +198,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8008801171234956006, guid: 3641288875746054b8425bb14db432b2, type: 3}
+      propertyPath: hurtSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 9eff8546e19a966489b44fefbe63e5c0, type: 3}
+    - target: {fileID: 8008801171234956006, guid: 3641288875746054b8425bb14db432b2, type: 3}
+      propertyPath: deathSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 9eff8546e19a966489b44fefbe63e5c0, type: 3}
+    - target: {fileID: 8008801171234956006, guid: 3641288875746054b8425bb14db432b2, type: 3}
+      propertyPath: audioSource
+      value: 
+      objectReference: {fileID: 72130812}
     - target: {fileID: 8936389538198550017, guid: 3641288875746054b8425bb14db432b2, type: 3}
       propertyPath: m_Name
       value: enemy_Wizard
@@ -235,6 +247,11 @@ MonoBehaviour:
 --- !u!4 &72130811 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4858955043004106510, guid: 3641288875746054b8425bb14db432b2, type: 3}
+  m_PrefabInstance: {fileID: 72130808}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &72130812 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 5969811283799147360, guid: 3641288875746054b8425bb14db432b2, type: 3}
   m_PrefabInstance: {fileID: 72130808}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &116824071
@@ -13910,7 +13927,7 @@ Camera:
   far clip plane: 1000
   field of view: 8
   orthographic: 1
-  orthographic size: 2.4
+  orthographic size: 1.51
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -13935,7 +13952,7 @@ Transform:
   m_GameObject: {fileID: 1399956427}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.529009, y: 23.881691, z: -10}
+  m_LocalPosition: {x: -9.799995, y: 28.371693, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -11,6 +11,14 @@ public class HeroKnight : MonoBehaviour
     [SerializeField] bool m_noBlood = false;
     [SerializeField] GameObject m_slideDust;
 
+    [Header("Audio (Player SFX)")]
+    [Tooltip("L'AudioSource del Player (lo stesso usato per la vita)")]
+    public AudioSource audioSource;
+    [Tooltip("Inserisci qui i 2 (o più) suoni del fendente. Il gioco ne sceglierà uno a caso ad ogni colpo!")]
+    public AudioClip[] swordSwooshSounds;
+    [Tooltip("Suono per quando usi la pozione gialla (Power Up)")]
+    public AudioClip powerUpSound; // <--- NUOVO SFX POZIONE GIALLA
+
     [Header("Combattimento")]
     public Transform attackPoint;
     public float attackRadius = 0.6f;
@@ -83,6 +91,11 @@ public class HeroKnight : MonoBehaviour
         m_spriteRenderer = GetComponent<SpriteRenderer>();
         playerHealth = GetComponent<PlayerHealth>();
         playerCol = GetComponent<Collider2D>();
+
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
 
         defaultGravity = m_body2d.gravityScale;
 
@@ -258,6 +271,12 @@ public class HeroKnight : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && m_timeSinceAttack >= requiredCooldown && !m_rolling && !m_blocking)
         {
+            if (audioSource != null && swordSwooshSounds.Length > 0)
+            {
+                int randomIndex = Random.Range(0, swordSwooshSounds.Length);
+                audioSource.PlayOneShot(swordSwooshSounds[randomIndex]);
+            }
+
             if (m_timeSinceAttack > 1.0f || !attackConnected) m_currentAttack = 1;
             else
             {
@@ -449,6 +468,14 @@ public class HeroKnight : MonoBehaviour
 
         isPoweredUp = true;
         Debug.Log("POWER UP ATTIVO! Forza e Velocità x" + multiplier);
+
+        // --- SFX POWER UP ---
+        if (audioSource != null && powerUpSound != null)
+        {
+            audioSource.pitch = 1f; // Resettiamo l'intonazione per non farlo suonare strano
+            audioSource.PlayOneShot(powerUpSound);
+        }
+        // --------------------
 
         originalSpeed = m_speed;
         originalDamage = attackDamage;

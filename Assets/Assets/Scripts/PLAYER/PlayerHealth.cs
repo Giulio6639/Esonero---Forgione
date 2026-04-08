@@ -14,9 +14,25 @@ public class PlayerHealth : MonoBehaviour
     public Transform respawnPoint;
 
     [Header("UI Salute")]
+    [Tooltip("Trascina qui l'oggetto figlio Health_Fill (il liquido rosso)")]
     public Image healthBarFill;
-    public RectTransform healthBarContainer; // Il riquadro da allungare
-    public float pixelPerPuntoVita = 2f;     // Moltiplicatore: quanto è largo 1 HP?
+    [Tooltip("Trascina qui l'oggetto vuoto PADRE (HealthBar_Master)")]
+    public RectTransform healthBarMaster;
+    public float pixelPerPuntoVita = 2f;
+
+    [Header("Audio")]
+    [Tooltip("L'AudioSource attaccato al Player")]
+    public AudioSource audioSource;
+    [Tooltip("Effetto sonoro per la cura")]
+    public AudioClip healSound;
+    [Tooltip("Suono per il Parry Perfetto")]
+    public AudioClip perfectParrySound;
+    [Tooltip("Suono per il Blocco Normale")]
+    public AudioClip normalBlockSound;
+    [Tooltip("Suono per quando il Player viene colpito")]
+    public AudioClip hurtSound; // <--- NUOVO
+    [Tooltip("Suono per quando il Player muore")]
+    public AudioClip deathSound; // <--- NUOVO
 
     [Header("Impostazioni Invincibilità")]
     public float iFramesDuration = 1.5f;
@@ -49,7 +65,12 @@ public class PlayerHealth : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
 
-        AggiornaDimensioneBarra(); // <--- AGGIUNGI QUI
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
+        AggiornaDimensioneBarra();
         UpdateHealthUI();
     }
 
@@ -81,10 +102,16 @@ public class PlayerHealth : MonoBehaviour
     public void Heal(int healAmount)
     {
         if (currentHealth <= 0) return;
+
+        if (currentHealth < maxHealth && audioSource != null && healSound != null)
+        {
+            audioSource.pitch = 1f; // Reset del pitch per sicurezza
+            audioSource.PlayOneShot(healSound);
+        }
+
         currentHealth += healAmount;
         if (currentHealth > maxHealth) currentHealth = maxHealth;
         UpdateHealthUI();
-        Debug.Log("Curato di " + healAmount + ". Vita attuale: " + currentHealth);
     }
 
     public void TakeDamage(int damageAmount, Transform attacker, bool isComboFinisher = false)
@@ -99,11 +126,21 @@ public class PlayerHealth : MonoBehaviour
         {
             if (playerController.isParrying)
             {
-                Debug.Log("PARRY PERFETTO! 0 Danni.");
+                if (audioSource != null && perfectParrySound != null)
+                {
+                    audioSource.pitch = 1f;
+                    audioSource.PlayOneShot(perfectParrySound);
+                }
                 return;
             }
             else
             {
+                if (audioSource != null && normalBlockSound != null)
+                {
+                    audioSource.pitch = 1f;
+                    audioSource.PlayOneShot(normalBlockSound);
+                }
+
                 damageAmount = Mathf.Max(1, damageAmount / 2);
                 currentHealth -= damageAmount;
                 UpdateHealthUI();
@@ -120,9 +157,18 @@ public class PlayerHealth : MonoBehaviour
         isInvincible = true;
         iFramesTimer = iFramesDuration;
 
-        if (currentHealth <= 0) Die();
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
         else
         {
+            if (audioSource != null && hurtSound != null)
+            {
+                audioSource.pitch = Random.Range(0.9f, 1.1f);
+                audioSource.PlayOneShot(hurtSound);
+            }
+
             animator.SetTrigger("Hurt");
             StartCoroutine(ApplyKnockback(attacker));
         }
@@ -133,19 +179,24 @@ public class PlayerHealth : MonoBehaviour
         maxHealth += amount;
         currentHealth += amount;
 
-        AggiornaDimensioneBarra(); // <--- AGGIUNGI QUI
+        AggiornaDimensioneBarra();
         UpdateHealthUI();
 
-        Debug.Log("Vita massima aumentata! Nuova vita massima: " + maxHealth);
-    }
-    private void AggiornaDimensioneBarra()
-    {
-        if (healthBarContainer != null)
+        if (audioSource != null && healSound != null)
         {
-            // Cambia solo la larghezza (X) in base alla maxHealth, lascia inalterata l'altezza (Y)
-            healthBarContainer.sizeDelta = new Vector2(maxHealth * pixelPerPuntoVita, healthBarContainer.sizeDelta.y);
+            audioSource.pitch = 1f;
+            audioSource.PlayOneShot(healSound);
         }
     }
+
+    private void AggiornaDimensioneBarra()
+    {
+        if (healthBarMaster != null)
+        {
+            healthBarMaster.sizeDelta = new Vector2(maxHealth * pixelPerPuntoVita, healthBarMaster.sizeDelta.y);
+        }
+    }
+
     private IEnumerator ApplyKnockback(Transform attacker)
     {
         playerController.isStunned = true;
@@ -168,6 +219,12 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
+        if (audioSource != null && deathSound != null)
+        {
+            audioSource.pitch = 1f;
+            audioSource.PlayOneShot(deathSound);
+        }
+
         animator.SetTrigger("Death");
         playerController.isStunned = true;
         rb.linearVelocity = Vector2.zero;

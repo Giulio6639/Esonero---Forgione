@@ -198,6 +198,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!224 &13944582 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7897219834206850736, guid: bc2a3717d1b8183459716254e5705ac7, type: 3}
+  m_PrefabInstance: {fileID: 4269148660066792623}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &51233248
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,11 +298,11 @@ PrefabInstance:
     - target: {fileID: 961194652051280535, guid: 9402206924a78d14baec8f6c761237fa, type: 3}
       propertyPath: healthBarFill
       value: 
-      objectReference: {fileID: 1589543537}
+      objectReference: {fileID: 1944937162}
     - target: {fileID: 961194652051280535, guid: 9402206924a78d14baec8f6c761237fa, type: 3}
-      propertyPath: healthBarContainer
+      propertyPath: healthBarMaster
       value: 
-      objectReference: {fileID: 1216922174}
+      objectReference: {fileID: 13944582}
     - target: {fileID: 1209145240271291540, guid: 9402206924a78d14baec8f6c761237fa, type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.3
@@ -345,10 +350,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2828473212976238109, guid: 9402206924a78d14baec8f6c761237fa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 627259557}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9402206924a78d14baec8f6c761237fa, type: 3}
 --- !u!1 &94030443
 GameObject:
@@ -823,10 +825,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7144837007829093060, guid: 610f920cf1afa2f409cd2f03a4336019, type: 3}
-      propertyPath: tabellaDropGemme.Array.data[0].probabilitaDrop
-      value: 100
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1187,7 +1185,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 122
-      m_TileSpriteIndex: 8
+      m_TileSpriteIndex: 11
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -5432,14 +5430,14 @@ Tilemap:
     m_Data: {fileID: 5752433424364316308, guid: a419b29d7ee1f4b45acf54016a814fbb, type: 3}
   - m_RefCount: 4
     m_Data: {fileID: 7835228335314846166, guid: a419b29d7ee1f4b45acf54016a814fbb, type: 3}
-  - m_RefCount: 1
-    m_Data: {fileID: 6640528522065636692, guid: a419b29d7ee1f4b45acf54016a814fbb, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: -7266007344547914704, guid: a419b29d7ee1f4b45acf54016a814fbb, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 2510463560805888665, guid: a419b29d7ee1f4b45acf54016a814fbb, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: 6640528522065636692, guid: a419b29d7ee1f4b45acf54016a814fbb, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 3832355742154269557, guid: a3094539df71ba74482c7a0c4d09b6c7, type: 3}
   - m_RefCount: 1
@@ -31880,23 +31878,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2251518283213295311, guid: 0cd83268b404ee749927be66e9a67810, type: 3}
   m_PrefabInstance: {fileID: 625388549}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &627259548 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2828473212976238109, guid: 9402206924a78d14baec8f6c761237fa, type: 3}
-  m_PrefabInstance: {fileID: 62027414}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &627259557
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 627259548}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5994d3863b63e5646b804ccd2f09d0f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &630683964
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32573,11 +32554,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 2251518283213295311, guid: 0cd83268b404ee749927be66e9a67810, type: 3}
   m_PrefabInstance: {fileID: 6483359551658591861}
-  m_PrefabAsset: {fileID: 0}
---- !u!224 &1216922174 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 8506559731339504356, guid: bc2a3717d1b8183459716254e5705ac7, type: 3}
-  m_PrefabInstance: {fileID: 4269148660066792623}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1267756034
 GameObject:
@@ -33501,17 +33477,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2251518283213295311, guid: 0cd83268b404ee749927be66e9a67810, type: 3}
   m_PrefabInstance: {fileID: 1587669432}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1589543537 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3923777896861274392, guid: bc2a3717d1b8183459716254e5705ac7, type: 3}
-  m_PrefabInstance: {fileID: 4269148660066792623}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1601298582 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2175218983614781649, guid: fb42044f7e5d8ea478eedcdcccb63b13, type: 3}
@@ -35164,6 +35129,17 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!114 &1944937162 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6474293107334615623, guid: bc2a3717d1b8183459716254e5705ac7, type: 3}
+  m_PrefabInstance: {fileID: 4269148660066792623}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2115043168
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35337,10 +35313,6 @@ PrefabInstance:
     - target: {fileID: 4326224195812885887, guid: bc2a3717d1b8183459716254e5705ac7, type: 3}
       propertyPath: m_Name
       value: Canvas
-      objectReference: {fileID: 0}
-    - target: {fileID: 4326224195812885887, guid: bc2a3717d1b8183459716254e5705ac7, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6475219198685046485, guid: bc2a3717d1b8183459716254e5705ac7, type: 3}
       propertyPath: m_Pivot.x

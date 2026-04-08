@@ -11,6 +11,12 @@ public class DialogueController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI NPCDialogueText;
     [SerializeField] private float typeSpeed = 10;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip defaultVoiceSound; // Usato se il DialogueText non ha un suono specifico
+    [Range(0.5f, 2f)][SerializeField] private float minPitch = 0.95f; // Variazione minima dell'intonazione
+    [Range(0.5f, 2f)][SerializeField] private float maxPitch = 1.05f; // Variazione massima
+
     public static bool isDialogueActive = false;
 
     private Queue<string> paragraphs = new Queue<string>();
@@ -19,7 +25,7 @@ public class DialogueController : MonoBehaviour
     private bool isTyping;
 
     private string p;
-    
+
     private Coroutine typeDialogueCoroutine;
 
     private const string HTML_alpha = "<color=#00000000>";
@@ -29,6 +35,8 @@ public class DialogueController : MonoBehaviour
     private string sceneToLoad;
     private bool shouldChangeScene = false;
 
+    private AudioClip currentVoiceSound; // Memorizza la voce di chi sta parlando in questo momento
+
     public void SetSceneExit(string sceneName)
     {
         sceneToLoad = sceneName;
@@ -37,12 +45,11 @@ public class DialogueController : MonoBehaviour
 
     public void DisplayNextParagraph(DialogueText dialogueText)
     {
-        // Se stiamo aspettando il secondo di pausa, non fare nulla
         if (isWaitingBeforeType) return;
 
         if (paragraphs.Count == 0)
         {
-            if(!conversationEnded)
+            if (!conversationEnded)
             {
                 StartConversation(dialogueText);
             }
@@ -75,62 +82,58 @@ public class DialogueController : MonoBehaviour
             gameObject.SetActive(true);
         }
 
-        // Time Stop
         Time.timeScale = 0f;
 
-        // Update the speaker name
         NPCNameText.text = dialogueText.SpeakerName;
 
-        // --- NUOVO: Puliamo la coda prima di inserire i nuovi testi ---
+        // --- GESTIONE VOCE ---
+        // Se il DialogueText ha un suono, usa quello, altrimenti usa quello di default
+        currentVoiceSound = dialogueText.voiceSound != null ? dialogueText.voiceSound : defaultVoiceSound;
+
         paragraphs.Clear();
         conversationEnded = false;
         isTyping = false;
         isWaitingBeforeType = false;
 
-        // Add dialogue Text to the queue
         for (int i = 0; i < dialogueText.paragraphs.Length; i++)
         {
             paragraphs.Enqueue(dialogueText.paragraphs[i]);
         }
     }
+
     private void EndConversation()
     {
         isDialogueActive = false;
         conversationEnded = false;
         Time.timeScale = 1f;
 
-        // --- FIX: Chiudi SEMPRE il pannello del dialogo ---
         if (gameObject.activeSelf)
         {
             gameObject.SetActive(false);
         }
 
-        // --- CAMBIO SCENA ---
         if (shouldChangeScene && !string.IsNullOrEmpty(sceneToLoad))
         {
-            // Usiamo il tuo SceneChanger per avere una transizione fluida!
             if (SceneChanger.instance != null)
             {
                 SceneChanger.instance.ChangeLevelTo(sceneToLoad);
             }
             else
             {
-                // Fallback di sicurezza nel caso SceneChanger manchi
                 SceneManager.LoadScene(sceneToLoad);
             }
         }
 
-        shouldChangeScene = false; // Reset per il prossimo NPC
+        shouldChangeScene = false;
     }
 
     private IEnumerator TypeDialogueText(string p)
     {
         isTyping = true;
-        isWaitingBeforeType = true; // Blocca input durante l'attesa
+        isWaitingBeforeType = true;
 
         NPCDialogueText.text = "";
 
-        // ASPETTA 1 SECONDO (Realtime perché Time.timeScale è 0)
         yield return new WaitForSecondsRealtime(0.1f);
 
         isWaitingBeforeType = false;
@@ -144,6 +147,18 @@ public class DialogueController : MonoBehaviour
             NPCDialogueText.text = originalText;
             string displayedText = NPCDialogueText.text.Insert(alphaIndex, HTML_alpha);
             NPCDialogueText.text = displayedText;
+
+            // --- RIPRODUZIONE EFFETTO SONORO (Stile Undertale) ---
+            // Suoniamo solo se abbiamo una clip, un AudioSource, e se il carattere NON è uno spazio vuoto
+            if (currentVoiceSound != null && audioSource != null && c != ' ')
+            {
+                // Variamo leggermente il pitch per renderlo meno "robotico"
+                audioSource.pitch = Random.Range(minPitch, maxPitch);
+
+                // PlayOneShot permette ai bip di sovrapporsi leggermente se il testo è molto veloce
+                audioSource.PlayOneShot(currentVoiceSound);
+            }
+
             yield return new WaitForSecondsRealtime(MAX_TYPE_TIME / typeSpeed);
         }
 

@@ -10,8 +10,29 @@ public class HolyFire : MonoBehaviour
     public float tickRate = 0.3f;       // Ogni quanti secondi brucia? (0.3s significa più hit continui)
     public LayerMask enemyLayer;        // Assicurati di impostarlo su "Enemy" nell'Inspector
 
+    [Header("Audio (SFX)")]
+    [Tooltip("L'AudioSource attaccato a questo Prefab")]
+    public AudioSource audioSource;
+    [Tooltip("Il rumore della fiammata quando l'Acqua Santa esplode")]
+    public AudioClip igniteSound;
+
     void Start()
     {
+        // Se non hai trascinato l'AudioSource, lo cerca in automatico
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
+        // --- SFX FIAMMATA ---
+        if (audioSource != null && igniteSound != null)
+        {
+            // Cambiamo leggermente il pitch per non renderlo identico a ogni lancio
+            audioSource.pitch = Random.Range(0.9f, 1.1f);
+            audioSource.PlayOneShot(igniteSound);
+        }
+        // --------------------
+
         // Distrugge questo oggetto automaticamente dopo 1.5 secondi
         Destroy(gameObject, duration);
 

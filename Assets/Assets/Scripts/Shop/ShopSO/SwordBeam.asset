@@ -15,8 +15,8 @@ MonoBehaviour:
   upgradeName: Sword Beam
   description: "Lancia un raggio di luce quando la tua vita \xE8 al massimo."
   icon: {fileID: 21300000, guid: a1ff8d71f6d1a4809b4e35fac8d4a7df, type: 3}
-  baseCost: 50
-  costIncreasePerLevel: 25
+  baseCost: 1000
+  costIncreasePerLevel: 0
   maxLevel: 1
   type: 3
   amountToIncrease: 20

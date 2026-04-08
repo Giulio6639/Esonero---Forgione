@@ -15,7 +15,7 @@ MonoBehaviour:
   upgradeName: Vita Massima +
   description: Aumenta di 50 HP la tua vita massima.
   icon: {fileID: 21300000, guid: 15cc575b0d9a36846838578bfb080819, type: 3}
-  baseCost: 50
+  baseCost: 100
   costIncreasePerLevel: 25
   maxLevel: 5
   type: 0

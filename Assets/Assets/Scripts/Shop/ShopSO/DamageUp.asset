@@ -15,8 +15,8 @@ MonoBehaviour:
   upgradeName: Damage +
   description: Aumenta di 20 il danno inflitto ai nemici.
   icon: {fileID: 7014164231753827779, guid: 0cb8bd8bf236f26469ad5034ba638932, type: 3}
-  baseCost: 50
-  costIncreasePerLevel: 25
+  baseCost: 150
+  costIncreasePerLevel: 50
   maxLevel: 5
   type: 1
   amountToIncrease: 20
