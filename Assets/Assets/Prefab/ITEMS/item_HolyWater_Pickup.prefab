@@ -144,6 +144,8 @@ MonoBehaviour:
   throwForceX: 5
   throwForceY: 4
   firePrefab: {fileID: 3289193500794922701, guid: e81f56a3062fbd84ba570186a2007045, type: 3}
+  spawnOffsetX: 0
+  spawnOffsetY: 0
 --- !u!1 &7718140083989018884
 GameObject:
   m_ObjectHideFlags: 0

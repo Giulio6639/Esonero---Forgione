@@ -96,18 +96,28 @@ public class DialogueController : MonoBehaviour
     private void EndConversation()
     {
         isDialogueActive = false;
-
         conversationEnded = false;
         Time.timeScale = 1f;
+
+        // --- FIX: Chiudi SEMPRE il pannello del dialogo ---
+        if (gameObject.activeSelf)
+        {
+            gameObject.SetActive(false);
+        }
 
         // --- CAMBIO SCENA ---
         if (shouldChangeScene && !string.IsNullOrEmpty(sceneToLoad))
         {
-            SceneManager.LoadScene(sceneToLoad);
-        }
-        else
-        {
-            if (gameObject.activeSelf) gameObject.SetActive(false);
+            // Usiamo il tuo SceneChanger per avere una transizione fluida!
+            if (SceneChanger.instance != null)
+            {
+                SceneChanger.instance.ChangeLevelTo(sceneToLoad);
+            }
+            else
+            {
+                // Fallback di sicurezza nel caso SceneChanger manchi
+                SceneManager.LoadScene(sceneToLoad);
+            }
         }
 
         shouldChangeScene = false; // Reset per il prossimo NPC

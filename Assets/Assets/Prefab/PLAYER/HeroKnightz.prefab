@@ -47,12 +47,12 @@ MonoBehaviour:
   m_ComponentVersion: 2
   m_LightType: 1
   m_BlendStyleIndex: 0
-  m_FalloffIntensity: 0.5
+  m_FalloffIntensity: 0.928
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 2.06
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 0000000003aaf6e31d7f2baa158d6103
+  m_ApplyToSortingLayers: 158d61031d7f2baa
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -68,8 +68,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0.13775015, y: -0.050849915, z: 0}
-    m_Extent: {x: 14.16135, y: 14.45745, z: 0}
+    m_Center: {x: 0.17460012, y: 0.012750149, z: 0}
+    m_Extent: {x: 14.2101, y: 14.49415, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
@@ -82,11 +82,11 @@ MonoBehaviour:
   m_ShapePath:
   - {x: -0.45406485, y: -0.9058807, z: 0}
   - {x: -0.15495968, y: -0.91237223, z: 0}
-  - {x: 0.57646275, y: -0.93914974, z: 0}
+  - {x: 0.55480623, y: -0.9102745, z: 0}
   - {x: 0.73103905, y: -0.9128611, z: 0}
-  - {x: 0.6571841, y: 0.4945799, z: 0}
-  - {x: 0.21902847, y: 0.8376988, z: 0}
-  - {x: -0.34281683, y: 0.4674793, z: 0}
+  - {x: 0.8159976, y: 0.54511166, z: 0}
+  - {x: 0.21902847, y: 0.9387622, z: 0}
+  - {x: -0.46553755, y: 0.53244865, z: 0}
 --- !u!1 &1300388239610451345
 GameObject:
   m_ObjectHideFlags: 0
@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 6981859684473223624}
   - component: {fileID: 2404158322562813787}
   - component: {fileID: 5797060889803392944}
+  - component: {fileID: 7950985409136143275}
   m_Layer: 7
   m_Name: HeroKnightz
   m_TagString: Player
@@ -282,7 +283,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 56724757
-  m_SortingLayer: 3
+  m_SortingLayer: 5
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: ae297123f091bbf4e8f1835eb98fb293, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -390,6 +391,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5596975, y: 1.2}
   m_EdgeRadius: 0
+--- !u!114 &7950985409136143275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2828473212976238109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e32d05c6746c5d419ec749efece6d4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectIndex: 0
 --- !u!1 &5120467939700945490
 GameObject:
   m_ObjectHideFlags: 0

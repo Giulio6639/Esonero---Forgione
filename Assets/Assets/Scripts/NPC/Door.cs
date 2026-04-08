@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement; // Aggiunto per poter caricare le scene direttamente
 
 public class Door : NPC, ITalkable
 {
@@ -29,7 +30,7 @@ public class Door : NPC, ITalkable
     private bool hasFinishedFirstDialogue = false;
 
     private void Awake()
-    { 
+    {
         dialogueController = Object.FindFirstObjectByType<DialogueController>(FindObjectsInactive.Include);
         inventoryManager = Object.FindFirstObjectByType<InventoryManager>(FindObjectsInactive.Include);
     }
@@ -55,9 +56,26 @@ public class Door : NPC, ITalkable
             currentDialogue = secondDialogue;
         }
 
+        // --- SISTEMA DI CARICAMENTO DIRETTO SE NON C'E' DIALOGO ---
+        if (isLevelExit && currentDialogue == null)
+        {
+            Debug.Log("Nessun dialogo assegnato: Cambio scena istantaneo verso " + sceneToLoad);
+
+            if (SceneChanger.instance != null)
+            {
+                SceneChanger.instance.ChangeLevelTo(sceneToLoad);
+            }
+            else
+            {
+                SceneManager.LoadScene(sceneToLoad);
+            }
+            return; // Interrompiamo qui, non serve fare altro!
+        }
+        // ----------------------------------------------------------
+
         Talk(currentDialogue);
 
-        if (!hasFinishedFirstDialogue && dialogueController.gameObject.activeSelf)
+        if (!hasFinishedFirstDialogue && dialogueController != null && dialogueController.gameObject.activeSelf)
         {
             if (givesItem && inventoryManager != null)
             {
@@ -76,6 +94,9 @@ public class Door : NPC, ITalkable
             dialogueController.SetSceneExit(sceneToLoad);
         }
 
-        dialogueController.DisplayNextParagraph(dialogueText);
+        if (dialogueText != null)
+        {
+            dialogueController.DisplayNextParagraph(dialogueText);
+        }
     }
 }

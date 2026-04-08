@@ -113,11 +113,18 @@ public class ItemSlot : MonoBehaviour, IPointerClickHandler
     {
         quantity--;
 
+        // --- IL FIX E' QUI ---
+        // Se abbiamo consumato un oggetto, lo slot sicuramente NON è più pieno
+        if (quantity < maxNumberOfItems)
+        {
+            isFull = false;
+        }
+        // ---------------------
+
         if (quantity <= 0)
         {
             quantity = 0;
             quantityText.text = quantity.ToString();
-
             quantityText.color = Color.red;
         }
         else

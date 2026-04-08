@@ -24,6 +24,15 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
 
     private DialogueText currentActiveDialogue = null;
 
+    // --- NUOVO: La funzione Awake per catturare il Controller giusto! ---
+    private void Awake()
+    {
+        // Ignoriamo quello dell'Inspector e cerchiamo il controller VERO, 
+        // anche se al momento è nascosto/disattivato
+        dialogueController = FindFirstObjectByType<DialogueController>(FindObjectsInactive.Include);
+    }
+    // --------------------------------------------------------------------
+
     void Start()
     {
         // Controlli anti-crash iniziali

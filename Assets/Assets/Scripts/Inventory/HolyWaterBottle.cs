@@ -7,33 +7,52 @@ public class HolyWaterBottle : MonoBehaviour
     public float throwForceY = 4f;
 
     [Header("Cosa genera all'impatto?")]
-    public GameObject firePrefab; // Qui metterai il Prefab delle fiamme
+    public GameObject firePrefab;
+
+    [Header("Regolazione Posizione Fuoco (Offset)")]
+    [Tooltip("Sposta il fuoco a destra (valori positivi) o a sinistra (valori negativi)")]
+    public float spawnOffsetX = 0f;
+    [Tooltip("Sposta il fuoco in alto (valori positivi) o in basso (valori negativi)")]
+    public float spawnOffsetY = 0.5f;
+
+    // Questa variabile ci serve per capire da che parte stiamo guardando, 
+    // così l'offset sull'asse X si adatta alla direzione!
+    private int currentDirection = 1;
 
     public void Initialize(int direction)
     {
+        currentDirection = direction; // Salviamo la direzione per usarla nell'impatto
+
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
 
-        // Diamo la spinta in avanti e verso l'alto (effetto arco)
+        // Diamo la spinta
         rb.linearVelocity = new Vector2(throwForceX * direction, throwForceY);
 
-        // Facciamo girare lo sprite in base alla direzione
+        // Orientiamo la bottiglia
         transform.localScale = new Vector3(direction, 1, 1);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // Ignoriamo il Player e i trigger (come la visuale dei nemici)
         if (collision.CompareTag("Player") || collision.isTrigger) return;
 
         if (firePrefab != null)
         {
-            // Creiamo un "Offset" (uno scarto). 
-            // Alziamo la posizione Y di 0.5 (puoi aumentare questo numero se la fiamma è enorme)
-            Vector3 spawnPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
+            // Calcoliamo la posizione esatta. 
+            // Moltiplichiamo l'offsetX per la direzione, così se lanci a sinistra
+            // l'offset non finisce dalla parte sbagliata!
+            Vector3 spawnPosition = new Vector3(
+                transform.position.x + (spawnOffsetX * currentDirection),
+                transform.position.y + spawnOffsetY,
+                transform.position.z
+            );
 
-            // Generiamo il fuoco sulla nuova posizione rialzata
+            // Spawna il fuoco con le nuove coordinate modificate
             Instantiate(firePrefab, spawnPosition, Quaternion.identity);
         }
 
+        // Distruggi la bottiglia all'impatto
         Destroy(gameObject);
     }
 }
