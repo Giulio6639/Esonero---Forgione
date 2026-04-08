@@ -316,7 +316,7 @@ MonoBehaviour:
     probabilitaDrop: 10
   forzaEsplosioneGemme: 4
   disappearDelay: 2.5
-  deathParticles: {fileID: 166889975601686192, guid: 50093039979299442a38bd39ba8c7727, type: 3}
+  deathParticles: {fileID: 0}
   aiScript: {fileID: 3528974404596628206}
 --- !u!82 &5095416245881205112
 AudioSource:

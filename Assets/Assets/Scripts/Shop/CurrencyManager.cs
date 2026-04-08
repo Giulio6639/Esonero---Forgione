@@ -37,4 +37,11 @@ public class CurrencyManager : MonoBehaviour
         }
         return false;
     }
+
+    public void DimezzaGemme()
+    {
+        gemmeTotali = gemmeTotali / 2;
+
+        Debug.Log("Gemme dimezzate! Nuova quantità: " + gemmeTotali);
+    }
 }

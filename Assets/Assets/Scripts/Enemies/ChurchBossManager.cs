@@ -16,6 +16,10 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
     public DialogueText introDialogue;
     public DialogueText outroDialogue;
 
+    [Header("Audio (Boss Theme)")]
+    [Tooltip("La musica epica che parte quando inizia il combattimento")]
+    public AudioClip bossMusic; // <--- NUOVO
+
     [Header("Impostazioni Uscita")]
     public string sceneToLoadAfterBoss = "Level02";
 
@@ -24,18 +28,13 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
 
     private DialogueText currentActiveDialogue = null;
 
-    // --- NUOVO: La funzione Awake per catturare il Controller giusto! ---
     private void Awake()
     {
-        // Ignoriamo quello dell'Inspector e cerchiamo il controller VERO, 
-        // anche se al momento è nascosto/disattivato
         dialogueController = FindFirstObjectByType<DialogueController>(FindObjectsInactive.Include);
     }
-    // --------------------------------------------------------------------
 
     void Start()
     {
-        // Controlli anti-crash iniziali
         if (bossAI != null) bossAI.enabled = false;
         if (bossHealth != null) bossHealth.enabled = false;
 
@@ -52,7 +51,7 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
 
     public void StartBossSequence()
     {
-        Debug.Log("Il Manager ha ricevuto il segnale! Stato attuale: " + currentState); // LOG 2
+        Debug.Log("Il Manager ha ricevuto il segnale! Stato attuale: " + currentState);
 
         if (currentState == RoomState.Dormant)
         {
@@ -64,7 +63,7 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
     private IEnumerator StartIntroRoutine()
     {
         yield return new WaitForSeconds(0.5f);
-        Debug.Log("Faccio partire il Dialogo Iniziale!"); // LOG 3
+        Debug.Log("Faccio partire il Dialogo Iniziale!");
 
         currentActiveDialogue = introDialogue;
         Talk(introDialogue);
@@ -90,6 +89,14 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
                     if (bossHealth != null) bossHealth.enabled = true;
                     if (bossRb != null) bossRb.simulated = true;
                     Debug.Log("IL MAGO SI SVEGLIA! BATTAGLIA INIZIATA!");
+
+                    // --- CAMBIO MUSICA ---
+                    // Chiamiamo l'AudioManager globale e gli diciamo di suonare la Boss Theme!
+                    if (AudioManager.Instance != null && bossMusic != null)
+                    {
+                        AudioManager.Instance.PlayMusic(bossMusic);
+                    }
+                    // ---------------------
                 }
                 else if (currentState == RoomState.OutroDialogue)
                 {
@@ -116,27 +123,17 @@ public class ChurchBossManager : MonoBehaviour, ITalkable
 
         if (bossAnim != null)
         {
-            // OPZIONE 1: Rimettiamo il Bool originale che avevi nel tuo primissimo script (non si sa mai!)
             bossAnim.SetBool("isDead", true);
-
-            // OPZIONE 2: L'OPZIONE NUCLEARE. 
-            // Forza la riproduzione ignorando le frecce dell'Animator.
-            // ATTENZIONE: Devi scrivere il nome ESATTO del quadratino grigio dell'animazione di morte!
-            // Se nell'Animator il quadratino si chiama "Wizard_Death", scrivi "Wizard_Death".
             bossAnim.Play("anim_Death_Wizard");
         }
 
-        // 1. Aspettiamo che cada a terra
         yield return new WaitForSeconds(2.5f);
 
-        // 2. Chiave ottenuta!
         GameFlow.hasChurchKey = true;
         Debug.Log("Chiave Ottenuta!");
 
-        // 3. Pausa drammatica
         yield return new WaitForSeconds(2f);
 
-        // 4. Caricamento scena
         GameFlow.targetSpawnPoint = "ChurchExitSpawn";
         SceneManager.LoadScene(sceneToLoadAfterBoss);
     }

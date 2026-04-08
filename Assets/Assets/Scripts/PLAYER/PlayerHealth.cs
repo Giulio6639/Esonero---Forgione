@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -8,31 +9,26 @@ public class PlayerHealth : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
 
-    [Header("Sistema di Vite")]
+    [Header("Sistema di Vite & Spawn")]
     public int startingLives = 3;
     public int currentLives;
-    public Transform respawnPoint;
+    public Transform respawnPoint; // Ora verrà aggiornato dai Checkpoint!
+
+    [Header("Game Over UI")]
+    public GameObject gameOverPanel;
 
     [Header("UI Salute")]
-    [Tooltip("Trascina qui l'oggetto figlio Health_Fill (il liquido rosso)")]
     public Image healthBarFill;
-    [Tooltip("Trascina qui l'oggetto vuoto PADRE (HealthBar_Master)")]
     public RectTransform healthBarMaster;
     public float pixelPerPuntoVita = 2f;
 
     [Header("Audio")]
-    [Tooltip("L'AudioSource attaccato al Player")]
     public AudioSource audioSource;
-    [Tooltip("Effetto sonoro per la cura")]
     public AudioClip healSound;
-    [Tooltip("Suono per il Parry Perfetto")]
     public AudioClip perfectParrySound;
-    [Tooltip("Suono per il Blocco Normale")]
     public AudioClip normalBlockSound;
-    [Tooltip("Suono per quando il Player viene colpito")]
-    public AudioClip hurtSound; // <--- NUOVO
-    [Tooltip("Suono per quando il Player muore")]
-    public AudioClip deathSound; // <--- NUOVO
+    public AudioClip hurtSound;
+    public AudioClip deathSound;
 
     [Header("Impostazioni Invincibilità")]
     public float iFramesDuration = 1.5f;
@@ -70,6 +66,8 @@ public class PlayerHealth : MonoBehaviour
             audioSource = GetComponent<AudioSource>();
         }
 
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+
         AggiornaDimensioneBarra();
         UpdateHealthUI();
     }
@@ -105,7 +103,7 @@ public class PlayerHealth : MonoBehaviour
 
         if (currentHealth < maxHealth && audioSource != null && healSound != null)
         {
-            audioSource.pitch = 1f; // Reset del pitch per sicurezza
+            audioSource.pitch = 1f;
             audioSource.PlayOneShot(healSound);
         }
 
@@ -217,6 +215,13 @@ public class PlayerHealth : MonoBehaviour
 
     public bool IsAtMaxHealth() { return currentHealth >= maxHealth; }
 
+    // --- NUOVA FUNZIONE PER I CHECKPOINT ---
+    public void SetRespawnPoint(Transform newPoint)
+    {
+        respawnPoint = newPoint;
+    }
+    // ---------------------------------------
+
     private void Die()
     {
         if (audioSource != null && deathSound != null)
@@ -230,21 +235,63 @@ public class PlayerHealth : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         currentHealth = 0;
         UpdateHealthUI();
-        currentLives--;
 
-        if (currentLives > 0) StartCoroutine(RespawnRoutine());
+        StartCoroutine(ShowGameOverRoutine());
     }
 
-    private IEnumerator RespawnRoutine()
+    private IEnumerator ShowGameOverRoutine()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
+        Time.timeScale = 0f;
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+    }
+
+    // ==========================================
+    // FUNZIONI PER I PULSANTI DELLA UI
+    // ==========================================
+
+    public void RetryGame()
+    {
+        Time.timeScale = 1f;
+
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+
+        // --- PENALITÀ: DIMEZZA LE GEMME ---
+        if (CurrencyManager.Instance != null)
+        {
+            CurrencyManager.Instance.DimezzaGemme();
+        }
+        // ----------------------------------
+
         if (respawnPoint != null) transform.position = respawnPoint.position;
+
         currentHealth = maxHealth;
         UpdateHealthUI();
+
         animator.ResetTrigger("Death");
         animator.Play("Idle");
         playerController.isStunned = false;
+
         isInvincible = true;
         iFramesTimer = 2f;
+    }
+    // --- AGGIUNGI QUESTA FUNZIONE ALLA FINE DI PLAYERHEALTH ---
+    public void InstantDeath()
+    {
+        // Ignora qualsiasi invincibilità e azzera la vita
+        currentHealth = 0;
+        UpdateHealthUI();
+
+        // Richiama la tua sequenza di morte (GameOver, Suoni, ecc.)
+        Die();
+    }
+    public void ReturnToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
     }
 }

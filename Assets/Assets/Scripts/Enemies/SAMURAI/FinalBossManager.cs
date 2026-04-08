@@ -7,7 +7,7 @@ public class FinalBossManager : MonoBehaviour, ITalkable
 {
     [Header("Riferimenti Boss Samurai")]
     public GameObject bossGameObject;
-    public SamuraiAI bossAI; // <-- Collegato al nuovo script del Samurai
+    public SamuraiAI bossAI;
     public EnemyHealth bossHealth;
     private Rigidbody2D bossRb;
 
@@ -16,8 +16,12 @@ public class FinalBossManager : MonoBehaviour, ITalkable
     public DialogueText introDialogue;
     public DialogueText outroDialogue;
 
+    [Header("Audio (Boss Theme)")]
+    [Tooltip("La musica epica che parte quando inizia il combattimento finale")]
+    public AudioClip bossMusic; // <--- NUOVO
+
     [Header("Impostazioni Uscita")]
-    public string creditsSceneName = "CreditsScene"; // <-- Inserisci qui il nome esatto della tua scena dei Titoli di Coda
+    public string creditsSceneName = "CreditsScene";
 
     private enum RoomState { Dormant, IntroDialogue, Fighting, OutroDialogue, Dying }
     private RoomState currentState = RoomState.Dormant;
@@ -26,14 +30,13 @@ public class FinalBossManager : MonoBehaviour, ITalkable
 
     void Start()
     {
-        // Il boss inizia "dormiente"
         if (bossAI != null) bossAI.enabled = false;
         if (bossHealth != null) bossHealth.enabled = false;
 
         if (bossGameObject != null)
         {
             bossRb = bossGameObject.GetComponent<Rigidbody2D>();
-            if (bossRb != null) bossRb.simulated = false; // Ferma la fisica (non cade)
+            if (bossRb != null) bossRb.simulated = false;
         }
         else
         {
@@ -52,14 +55,13 @@ public class FinalBossManager : MonoBehaviour, ITalkable
 
     private IEnumerator StartIntroRoutine()
     {
-        yield return new WaitForSeconds(0.5f); // Pausa scenica prima di parlare
+        yield return new WaitForSeconds(0.5f);
         currentActiveDialogue = introDialogue;
         Talk(introDialogue);
     }
 
     void Update()
     {
-        // --- GESTIONE DEI DIALOGHI ---
         if (currentActiveDialogue != null)
         {
             if (Keyboard.current.eKey.wasPressedThisFrame)
@@ -67,22 +69,27 @@ public class FinalBossManager : MonoBehaviour, ITalkable
                 Talk(currentActiveDialogue);
             }
 
-            // Se il riquadro del dialogo si spegne, significa che abbiamo finito di parlare
             if (dialogueController != null && !dialogueController.gameObject.activeSelf)
             {
                 currentActiveDialogue = null;
 
                 if (currentState == RoomState.IntroDialogue)
                 {
-                    // INIZIA LA BATTAGLIA
                     currentState = RoomState.Fighting;
                     if (bossAI != null) bossAI.enabled = true;
                     if (bossHealth != null) bossHealth.enabled = true;
                     if (bossRb != null) bossRb.simulated = true;
+
+                    // --- CAMBIO MUSICA ---
+                    // Chiamiamo l'AudioManager globale e facciamo partire il tema finale!
+                    if (AudioManager.Instance != null && bossMusic != null)
+                    {
+                        AudioManager.Instance.PlayMusic(bossMusic);
+                    }
+                    // ---------------------
                 }
                 else if (currentState == RoomState.OutroDialogue)
                 {
-                    // IL DIALOGO FINALE È FINITO, MUORE
                     currentState = RoomState.Dying;
                     StartCoroutine(FinalDeathSequence());
                 }
@@ -90,11 +97,10 @@ public class FinalBossManager : MonoBehaviour, ITalkable
             return;
         }
 
-        // --- CONTROLLO MORTE DEL BOSS ---
         if (currentState == RoomState.Fighting && bossHealth != null && bossHealth.currentHealth <= 0)
         {
             currentState = RoomState.OutroDialogue;
-            Time.timeScale = 0f; // Congela l'azione per le ultime parole
+            Time.timeScale = 0f;
             currentActiveDialogue = outroDialogue;
             Talk(outroDialogue);
         }
@@ -102,7 +108,6 @@ public class FinalBossManager : MonoBehaviour, ITalkable
 
     private IEnumerator FinalDeathSequence()
     {
-        // IMPORTANTE: Rimettiamo il tempo normale, altrimenti la morte si congela a schermo!
         Time.timeScale = 1f;
 
         Animator bossAnim = null;
@@ -110,14 +115,11 @@ public class FinalBossManager : MonoBehaviour, ITalkable
 
         if (bossAnim != null)
         {
-            // Richiama l'animazione di morte del Samurai
             bossAnim.SetBool("isDead", true);
         }
 
-        // 1. Aspettiamo che cada a terra e ci godiamo la scena (es. 3 o 4 secondi)
         yield return new WaitForSeconds(3.5f);
 
-        // 2. Carichiamo la scena dei Crediti!
         Debug.Log("Carico i Titoli di Coda...");
         SceneManager.LoadScene(creditsSceneName);
     }

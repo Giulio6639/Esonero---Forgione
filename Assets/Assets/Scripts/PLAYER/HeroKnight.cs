@@ -17,7 +17,7 @@ public class HeroKnight : MonoBehaviour
     [Tooltip("Inserisci qui i 2 (o più) suoni del fendente. Il gioco ne sceglierà uno a caso ad ogni colpo!")]
     public AudioClip[] swordSwooshSounds;
     [Tooltip("Suono per quando usi la pozione gialla (Power Up)")]
-    public AudioClip powerUpSound; // <--- NUOVO SFX POZIONE GIALLA
+    public AudioClip powerUpSound;
 
     [Header("Combattimento")]
     public Transform attackPoint;
@@ -261,12 +261,6 @@ public class HeroKnight : MonoBehaviour
 
         m_animator.SetFloat("AirSpeedY", m_body2d.linearVelocity.y);
 
-        if (Input.GetKeyDown("t") && !m_rolling)
-        {
-            m_animator.SetBool("noBlood", m_noBlood);
-            m_animator.SetTrigger("Death");
-        }
-
         float requiredCooldown = (attackConnected || m_timeSinceAttack > 1.0f) ? 0.25f : missCooldown;
 
         if (Input.GetMouseButtonDown(0) && m_timeSinceAttack >= requiredCooldown && !m_rolling && !m_blocking)
@@ -469,13 +463,11 @@ public class HeroKnight : MonoBehaviour
         isPoweredUp = true;
         Debug.Log("POWER UP ATTIVO! Forza e Velocità x" + multiplier);
 
-        // --- SFX POWER UP ---
         if (audioSource != null && powerUpSound != null)
         {
-            audioSource.pitch = 1f; // Resettiamo l'intonazione per non farlo suonare strano
+            audioSource.pitch = 1f;
             audioSource.PlayOneShot(powerUpSound);
         }
-        // --------------------
 
         originalSpeed = m_speed;
         originalDamage = attackDamage;
