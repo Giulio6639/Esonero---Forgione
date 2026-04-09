@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: IntroSamurai
   m_EditorClassIdentifier: 
   SpeakerName: Zephryrus
+  voiceSound: {fileID: 0}
   paragraphs:
-  - "E cos\xEC ci rincontriamo di nuovo..."
+  - "E cos\xEC sei finalmente giunto"
   - Stai per assistere alla nascita di un nuovo mondo...
   - "Ormai non c'\xE8 pi\xF9 nulla che tu possa fare."
   - Prima di ucciderti, voglio concederti la grazia di poter combattere...

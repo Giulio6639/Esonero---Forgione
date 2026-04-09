@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: OutroSamurai
   m_EditorClassIdentifier: 
   SpeakerName: Zephyrus
+  voiceSound: {fileID: 0}
   paragraphs:
   - Ugh...!
   - Come... hai... Ugh!
   - "Non \xE8 possibile... il mio mondo..."
   - Ormai ho perso tutte le mie speranze...
-  - Hai avuto la meglio ancora una volta...
+  - ARGHH!
   - Ma non finisce qui!

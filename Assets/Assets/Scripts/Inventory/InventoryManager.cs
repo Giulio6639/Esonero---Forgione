@@ -44,6 +44,11 @@ public class InventoryManager : MonoBehaviour
                 menuActivated = false;
                 isInventoryOpen = false;
                 Time.timeScale = 1f;
+
+                // --- NASCONDI IL MOUSE QUANDO CHIUDI L'INVENTARIO ---
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+                // ----------------------------------------------------
             }
             else
             {
@@ -51,6 +56,11 @@ public class InventoryManager : MonoBehaviour
                 menuActivated = true;
                 isInventoryOpen = true;
                 Time.timeScale = 0f;
+
+                // --- MOSTRA IL MOUSE QUANDO APRI L'INVENTARIO ---
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                // ------------------------------------------------
             }
         }
 

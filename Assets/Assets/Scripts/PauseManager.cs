@@ -61,7 +61,9 @@ public class PauseManager : MonoBehaviour
     public void Resume()
     {
         pauseMenuPanel.SetActive(false);
-        Time.timeScale = 1f; // Il tempo riparte
+        Time.timeScale = 1f;
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.ResumeMusic();// Il tempo riparte
         isGamePaused = false;
     }
 
@@ -69,6 +71,8 @@ public class PauseManager : MonoBehaviour
     {
         pauseMenuPanel.SetActive(true);
         Time.timeScale = 0f; // Il tempo si ferma
+        if (AudioManager.Instance != null) 
+            AudioManager.Instance.PauseMusic();
         isGamePaused = true;
     }
 

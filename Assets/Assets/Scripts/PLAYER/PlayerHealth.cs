@@ -12,7 +12,7 @@ public class PlayerHealth : MonoBehaviour
     [Header("Sistema di Vite & Spawn")]
     public int startingLives = 3;
     public int currentLives;
-    public Transform respawnPoint; // Ora verrà aggiornato dai Checkpoint!
+    public Transform respawnPoint;
 
     [Header("Game Over UI")]
     public GameObject gameOverPanel;
@@ -215,12 +215,18 @@ public class PlayerHealth : MonoBehaviour
 
     public bool IsAtMaxHealth() { return currentHealth >= maxHealth; }
 
-    // --- NUOVA FUNZIONE PER I CHECKPOINT ---
     public void SetRespawnPoint(Transform newPoint)
     {
         respawnPoint = newPoint;
     }
-    // ---------------------------------------
+
+    // --- NUOVO: ISTANT DEATH PER BURRONI ---
+    public void InstantDeath()
+    {
+        currentHealth = 0;
+        UpdateHealthUI();
+        Die();
+    }
 
     private void Die()
     {
@@ -244,10 +250,12 @@ public class PlayerHealth : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
         Time.timeScale = 0f;
 
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(true);
-        }
+        if (gameOverPanel != null) gameOverPanel.SetActive(true);
+        if (AudioManager.Instance != null) AudioManager.Instance.PauseMusic();
+
+        // --- MOSTRA IL MOUSE ---
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     // ==========================================
@@ -260,12 +268,19 @@ public class PlayerHealth : MonoBehaviour
 
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
 
-        // --- PENALITÀ: DIMEZZA LE GEMME ---
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        // RIACCENDI LA MUSICA QUANDO RICOMINCI
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.ResumeMusic();
+        }
+
         if (CurrencyManager.Instance != null)
         {
             CurrencyManager.Instance.DimezzaGemme();
         }
-        // ----------------------------------
 
         if (respawnPoint != null) transform.position = respawnPoint.position;
 
@@ -279,19 +294,20 @@ public class PlayerHealth : MonoBehaviour
         isInvincible = true;
         iFramesTimer = 2f;
     }
-    // --- AGGIUNGI QUESTA FUNZIONE ALLA FINE DI PLAYERHEALTH ---
-    public void InstantDeath()
-    {
-        // Ignora qualsiasi invincibilità e azzera la vita
-        currentHealth = 0;
-        UpdateHealthUI();
 
-        // Richiama la tua sequenza di morte (GameOver, Suoni, ecc.)
-        Die();
-    }
     public void ReturnToMainMenu()
     {
         Time.timeScale = 1f;
+
+        // RIACCENDI LA MUSICA QUANDO TORNI AL MENU (se no il menu sarebbe muto!)
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.ResumeMusic();
+        }
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
         SceneManager.LoadScene("MainMenu");
     }
 }

@@ -28,6 +28,13 @@ public class FinalBossManager : MonoBehaviour, ITalkable
 
     private DialogueText currentActiveDialogue = null;
 
+    // --- MANCAVA QUESTO! Trova il Controller in automatico ---
+    private void Awake()
+    {
+        dialogueController = FindFirstObjectByType<DialogueController>(FindObjectsInactive.Include);
+    }
+    // ---------------------------------------------------------
+
     void Start()
     {
         if (bossAI != null) bossAI.enabled = false;
@@ -46,6 +53,8 @@ public class FinalBossManager : MonoBehaviour, ITalkable
 
     public void StartBossSequence()
     {
+        Debug.Log("Il Samurai ha ricevuto il segnale! Stato attuale: " + currentState);
+
         if (currentState == RoomState.Dormant)
         {
             currentState = RoomState.IntroDialogue;
@@ -56,6 +65,7 @@ public class FinalBossManager : MonoBehaviour, ITalkable
     private IEnumerator StartIntroRoutine()
     {
         yield return new WaitForSeconds(0.5f);
+        Debug.Log("Faccio partire il Dialogo Iniziale del Samurai!");
         currentActiveDialogue = introDialogue;
         Talk(introDialogue);
     }
@@ -79,12 +89,16 @@ public class FinalBossManager : MonoBehaviour, ITalkable
                     if (bossAI != null) bossAI.enabled = true;
                     if (bossHealth != null) bossHealth.enabled = true;
                     if (bossRb != null) bossRb.simulated = true;
+                    Debug.Log("IL SAMURAI SI SVEGLIA! BATTAGLIA INIZIATA!");
 
                     // --- CAMBIO MUSICA ---
-                    // Chiamiamo l'AudioManager globale e facciamo partire il tema finale!
                     if (AudioManager.Instance != null && bossMusic != null)
                     {
                         AudioManager.Instance.PlayMusic(bossMusic);
+                    }
+                    else
+                    {
+                        Debug.LogError("ERRORE MUSICA: AudioManager mancante o traccia Boss Music non assegnata!");
                     }
                     // ---------------------
                 }
@@ -129,6 +143,11 @@ public class FinalBossManager : MonoBehaviour, ITalkable
         if (dialogueController != null)
         {
             dialogueController.DisplayNextParagraph(dialogueText);
+        }
+        else
+        {
+            // Selezionato per evitare crash silenziosi!
+            Debug.LogError("ERRORE FATALE: Non hai trascinato il DialogueController nel Manager e non è stato trovato in automatico!");
         }
     }
 }

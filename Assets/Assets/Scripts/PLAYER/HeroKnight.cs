@@ -106,6 +106,9 @@ public class HeroKnight : MonoBehaviour
         {
             Debug.LogError("ATTENZIONE: Non esiste nessun Layer chiamato 'Stairs'. Crealo in alto a destra su Unity!");
         }
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public bool canInteract

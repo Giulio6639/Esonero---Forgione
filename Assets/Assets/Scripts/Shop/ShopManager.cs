@@ -41,6 +41,9 @@ public class ShopManager : MonoBehaviour
         shopPanel.SetActive(true);
         Time.timeScale = 0f;
         PulisciSelezione();
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     public void ChiudiShop()
@@ -48,6 +51,9 @@ public class ShopManager : MonoBehaviour
         shopPanel.SetActive(false);
         ChiudiPannelloConferma(); // Assicuriamoci che si chiuda anche questo
         Time.timeScale = 1f;
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public void SelezionaSlot(ShopSlot slotCliccato)

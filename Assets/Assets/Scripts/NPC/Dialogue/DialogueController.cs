@@ -13,9 +13,15 @@ public class DialogueController : MonoBehaviour
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip defaultVoiceSound; // Usato se il DialogueText non ha un suono specifico
-    [Range(0.5f, 2f)][SerializeField] private float minPitch = 0.95f; // Variazione minima dell'intonazione
-    [Range(0.5f, 2f)][SerializeField] private float maxPitch = 1.05f; // Variazione massima
+    [SerializeField] private AudioClip defaultVoiceSound;
+    [Range(0.5f, 2f)][SerializeField] private float minPitch = 0.95f;
+    [Range(0.5f, 2f)][SerializeField] private float maxPitch = 1.05f;
+
+    // --- NUOVO: Freno per il motore audio ---
+    [Tooltip("Tempo minimo tra un 'beep' e l'altro per non far crashare l'audio")]
+    [SerializeField] private float soundCooldown = 0.04f;
+    private float lastSoundTime = 0f;
+    // ----------------------------------------
 
     public static bool isDialogueActive = false;
 
@@ -35,7 +41,7 @@ public class DialogueController : MonoBehaviour
     private string sceneToLoad;
     private bool shouldChangeScene = false;
 
-    private AudioClip currentVoiceSound; // Memorizza la voce di chi sta parlando in questo momento
+    private AudioClip currentVoiceSound;
 
     public void SetSceneExit(string sceneName)
     {
@@ -86,8 +92,6 @@ public class DialogueController : MonoBehaviour
 
         NPCNameText.text = dialogueText.SpeakerName;
 
-        // --- GESTIONE VOCE ---
-        // Se il DialogueText ha un suono, usa quello, altrimenti usa quello di default
         currentVoiceSound = dialogueText.voiceSound != null ? dialogueText.voiceSound : defaultVoiceSound;
 
         paragraphs.Clear();
@@ -148,16 +152,21 @@ public class DialogueController : MonoBehaviour
             string displayedText = NPCDialogueText.text.Insert(alphaIndex, HTML_alpha);
             NPCDialogueText.text = displayedText;
 
-            // --- RIPRODUZIONE EFFETTO SONORO (Stile Undertale) ---
-            // Suoniamo solo se abbiamo una clip, un AudioSource, e se il carattere NON è uno spazio vuoto
+            // --- NUOVA LOGICA AUDIO OTTIMIZZATA ---
             if (currentVoiceSound != null && audioSource != null && c != ' ')
             {
-                // Variamo leggermente il pitch per renderlo meno "robotico"
-                audioSource.pitch = Random.Range(minPitch, maxPitch);
+                // Controlla se è passato abbastanza tempo dal suono precedente usando Time.unscaledTime
+                // (usiamo unscaledTime perché il gioco è in pausa durante i dialoghi: Time.timeScale = 0)
+                if (Time.unscaledTime - lastSoundTime >= soundCooldown)
+                {
+                    audioSource.pitch = Random.Range(minPitch, maxPitch);
+                    audioSource.PlayOneShot(currentVoiceSound);
 
-                // PlayOneShot permette ai bip di sovrapporsi leggermente se il testo è molto veloce
-                audioSource.PlayOneShot(currentVoiceSound);
+                    // Salviamo il momento esatto in cui abbiamo suonato
+                    lastSoundTime = Time.unscaledTime;
+                }
             }
+            // --------------------------------------
 
             yield return new WaitForSecondsRealtime(MAX_TYPE_TIME / typeSpeed);
         }

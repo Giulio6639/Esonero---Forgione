@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Sign 1-4
   m_EditorClassIdentifier: 
   SpeakerName: 
+  voiceSound: {fileID: 0}
   paragraphs:
-  - Premi "SHIFT" per schihvare.
+  - Premi "SHIFT" per schivare.

@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Aggiunto per poter caricare le scene direttamente
+using UnityEngine.SceneManagement;
 
 public class Door : NPC, ITalkable
 {
@@ -37,11 +37,13 @@ public class Door : NPC, ITalkable
 
     public override void Interact()
     {
+        // 1. CONTROLLO CHIAVE
         if (requiresChurchKey && !GameFlow.hasChurchKey)
         {
             if (lockedDialogue != null)
             {
-                Talk(lockedDialogue);
+                // Parla, MA non permettere il cambio scena!
+                Talk(lockedDialogue, false);
             }
             else
             {
@@ -50,17 +52,17 @@ public class Door : NPC, ITalkable
             return;
         }
 
+        // 2. LA PORTA È APERTA (o non richiede chiavi)
         DialogueText currentDialogue = firstDialogue;
         if (hasFinishedFirstDialogue && secondDialogue != null)
         {
             currentDialogue = secondDialogue;
         }
 
-        // --- SISTEMA DI CARICAMENTO DIRETTO SE NON C'E' DIALOGO ---
+        // Se non c'è nessun dialogo e deve cambiare scena
         if (isLevelExit && currentDialogue == null)
         {
             Debug.Log("Nessun dialogo assegnato: Cambio scena istantaneo verso " + sceneToLoad);
-
             if (SceneChanger.instance != null)
             {
                 SceneChanger.instance.ChangeLevelTo(sceneToLoad);
@@ -69,11 +71,11 @@ public class Door : NPC, ITalkable
             {
                 SceneManager.LoadScene(sceneToLoad);
             }
-            return; // Interrompiamo qui, non serve fare altro!
+            return;
         }
-        // ----------------------------------------------------------
 
-        Talk(currentDialogue);
+        // Parla e PERMETTI il cambio scena (se questa porta è una via d'uscita)
+        Talk(currentDialogue, isLevelExit);
 
         if (!hasFinishedFirstDialogue && dialogueController != null && dialogueController.gameObject.activeSelf)
         {
@@ -82,14 +84,16 @@ public class Door : NPC, ITalkable
                 inventoryManager.AddItem(itemName, itemQuantity, itemSprite, itemDescription);
                 givesItem = false;
             }
-
             hasFinishedFirstDialogue = true;
         }
     }
 
-    public void Talk(DialogueText dialogueText)
+    // --- FUNZIONE AGGIORNATA ---
+    // Abbiamo aggiunto il parametro "shouldChangeSceneAfterTalk"
+    public void Talk(DialogueText dialogueText, bool shouldChangeSceneAfterTalk)
     {
-        if (isLevelExit)
+        // Imposta l'uscita SOLO se questo specifico dialogo lo permette
+        if (shouldChangeSceneAfterTalk)
         {
             dialogueController.SetSceneExit(sceneToLoad);
         }
@@ -98,5 +102,11 @@ public class Door : NPC, ITalkable
         {
             dialogueController.DisplayNextParagraph(dialogueText);
         }
+    }
+
+    // Questa serve per mantenere compatibilità con l'interfaccia ITalkable
+    public void Talk(DialogueText dialogueText)
+    {
+        Talk(dialogueText, false);
     }
 }

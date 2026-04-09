@@ -9,20 +9,12 @@ public class MainMenu : MonoBehaviour
 
     public void StartGame()
     {
-        if (SceneChanger.instance != null)
-        {
-            SceneChanger.instance.ChangeLevelTo(firstLevelName);
-        }
-        else
-        {
-            SceneManager.LoadScene(firstLevelName);
-        }
+        SceneManager.LoadScene(firstLevelName);
     }
 
     public void QuitGame()
     {
-        Debug.Log("Quit");
-
+        Debug.Log("Il gioco è stato chiuso!");
         Application.Quit();
     }
 }
