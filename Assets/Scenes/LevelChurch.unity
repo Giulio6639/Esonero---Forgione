@@ -210,6 +210,10 @@ PrefabInstance:
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 72130812}
+    - target: {fileID: 8860514146663581834, guid: 3641288875746054b8425bb14db432b2, type: 3}
+      propertyPath: attackDamage
+      value: 35
+      objectReference: {fileID: 0}
     - target: {fileID: 8936389538198550017, guid: 3641288875746054b8425bb14db432b2, type: 3}
       propertyPath: m_Name
       value: enemy_Wizard
@@ -14091,7 +14095,7 @@ Camera:
   far clip plane: 1000
   field of view: 8
   orthographic: 1
-  orthographic size: 1.05
+  orthographic size: 1.055
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
